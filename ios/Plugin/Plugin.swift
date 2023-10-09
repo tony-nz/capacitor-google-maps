@@ -11,6 +11,8 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
     
     var customPolygons = [String: CustomPolygon]();
 
+    var customPolylines = [String: CustomPolyline]();
+
     var customWebView: CustomWKWebView?
 
     @objc func initialize(_ call: CAPPluginCall) {
