@@ -330,6 +330,43 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         }
     }
 
+    @objc func addPolyline(_ call: CAPPluginCall) {
+        let mapId: String = call.getString("mapId", "");
+
+        DispatchQueue.main.async {
+            guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+                call.reject("map not found")
+                return
+            }
+
+            if let path = call.getArray("path")?.capacitor.replacingNullValues() as? [JSObject?] {
+                let preferences = call.getObject("preferences", JSObject())
+
+                self.addPolyline([
+                    "path": path,
+                    "preferences": preferences
+                ], customMapView: customMapView) { polyline in
+                    call.resolve(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
+                }
+            }
+        }
+    }
+        
+    @objc func removePolyline(_ call: CAPPluginCall) {
+        let polylineId: String = call.getString("polylineId", "");
+
+        DispatchQueue.main.async {
+            if let customPolyline = self.customPolylines[polylineId] {
+                customPolyline.map = nil;
+                customPolyline.layer.removeFromSuperlayer()
+                self.customPolylines[polylineId] = nil;
+                call.resolve();
+            } else {
+                call.reject("polyline not found");
+            }
+        }
+    }
+
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
         setCallbackIdForEvent(call: call, eventName: CustomMapView.EVENT_DID_TAP_INFO_WINDOW);
     }
@@ -463,6 +500,20 @@ private extension CapacitorGoogleMaps {
             self.customPolygons[polygon.id] = polygon
 
             completion(polygon)
+        }
+    }
+
+    func addPolyline(_ polylineData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSPolyline>) {
+        DispatchQueue.main.async {
+            let polyline = CustomPolyline()
+
+            polyline.updateFromJSObject(polylineData)
+
+            polyline.map = customMapView.GMapView
+
+            self.customPolylines[polyline.id] = polyline
+
+            completion(polyline)
         }
     }
     

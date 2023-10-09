@@ -18,9 +18,10 @@ import {
   RemoveMarkerOptions,
   AddPolygonOptions,
   AddPolygonResult,
+  RemovePolygonOptions,
   AddPolylineOptions,
   AddPolylineResult,
-  RemovePolygonOptions,
+  RemovePolylineOptions,
   // events
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
