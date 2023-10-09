@@ -3,7 +3,7 @@ require 'json'
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name = 'CapacitorCommunityGoogleMaps'
+  s.name = 'CapacitorGoogleMaps'
   s.version = package['version']
   s.summary = package['description']
   s.license = package['license']
@@ -15,5 +15,6 @@ Pod::Spec.new do |s|
   s.dependency 'Capacitor'
   s.dependency 'GoogleMaps'
   s.dependency 'SDWebImage'
+  s.dependency 'SVGKit'
   s.static_framework = true
 end
