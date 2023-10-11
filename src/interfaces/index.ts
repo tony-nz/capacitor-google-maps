@@ -17,6 +17,11 @@ export { AddPolygonOptions, AddPolygonResult } from "./methods/AddPolygon";
 export { RemovePolygonOptions } from "./methods/RemovePolygon";
 export { AddPolylineOptions, AddPolylineResult } from "./methods/AddPolyline";
 export { RemovePolylineOptions } from "./methods/RemovePolyline";
+export {
+  AddDirectionsOptions,
+  AddDirectionsResult,
+} from "./methods/AddDirections";
+export { RemoveDirectionsOptions } from "./methods/RemoveDirections";
 
 // events
 export * from "./events/DidTapInfoWindow";
@@ -51,5 +56,7 @@ export { Polygon } from "./models/GoogleMap/Polygon/Polygon";
 export { PolygonPreferences } from "./models/GoogleMap/Polygon/PolygonPreferences";
 export { Polyline } from "./models/GoogleMap/Polyline/Polyline";
 export { PolylinePreferences } from "./models/GoogleMap/Polyline/PolylinePreferences";
+export { Direction } from "./models/GoogleMap/Direction/Directions";
+export { DirectionPreferences } from "./models/GoogleMap/Directions/DirectionsPreferences";
 export { BoundingRect } from "./models/BoundingRect";
 export { LatLng } from "./models/LatLng";

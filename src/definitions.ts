@@ -22,6 +22,9 @@ import {
   AddPolylineOptions,
   AddPolylineResult,
   RemovePolylineOptions,
+  AddDirectionsOptions,
+  AddDirectionsResult,
+  RemoveDirectionsOptions,
   // events
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
@@ -84,6 +87,10 @@ export interface CapacitorGoogleMapsPlugin {
   addPolyline(options: AddPolylineOptions): Promise<AddPolylineResult>;
 
   removePolyline(options: RemovePolylineOptions): Promise<void>;
+
+  addDirections(options: AddDirectionsOptions): Promise<AddDirectionsResult>;
+
+  removeDirections(options: RemoveDirectionsOptions): Promise<void>;
 
   didTapInfoWindow(
     options: DefaultEventOptions,
