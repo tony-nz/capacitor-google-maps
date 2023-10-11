@@ -6,15 +6,22 @@ def capacitor_pods
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
 end
 
+def dependency_pods
+	pod 'ObjectMapper', '~> 1.0'
+	pod 'Alamofire', '~> 3.0'
+end
+
 target 'Plugin' do
   use_frameworks!
   pod 'GoogleMaps'
   capacitor_pods
   pod 'SVGKit', :git => 'https://github.com/SVGKit/SVGKit.git', :branch => '3.x'
+  dependency_pods
 end
 
 target 'PluginTests' do
   use_frameworks!
   pod 'GoogleMaps'
   capacitor_pods
+  dependency_pods
 end
