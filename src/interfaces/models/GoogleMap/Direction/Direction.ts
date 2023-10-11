@@ -149,21 +149,21 @@ export enum DirectionsStatus {
   UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
-export interface DirectionsRenderer {
-  directions: Directions;
-  map: Map;
-  panel: HTMLElement;
-  routeIndex: number;
-  options: DirectionsRendererOptions;
-}
+// export interface DirectionsRenderer {
+//   directions: Directions;
+//   map: Map;
+//   panel: HTMLElement;
+//   routeIndex: number;
+//   options: DirectionsRendererOptions;
+// }
 
-export interface DirectionsRendererOptions {
-  directions: Directions;
-  map: Map;
-  panel: HTMLElement;
-  routeIndex: number;
-}
+// export interface DirectionsRendererOptions {
+//   directions: Directions;
+//   map: Map;
+//   panel: HTMLElement;
+//   routeIndex: number;
+// }
 
-export interface DirectionsRendererResult {
-  renderer: DirectionsRenderer;
-}
+// export interface DirectionsRendererResult {
+//   renderer: DirectionsRenderer;
+// }
