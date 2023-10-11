@@ -1,7 +1,7 @@
 import { LatLng } from "../../LatLng";
 import { TravelMode, UnitSystem } from "./Direction";
 
-export interface DirectionsPreferences {
+export interface DirectionPreferences {
   avoidHighways?: boolean;
   avoidTolls?: boolean;
   avoidFerries?: boolean;

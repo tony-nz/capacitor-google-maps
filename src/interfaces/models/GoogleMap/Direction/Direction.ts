@@ -1,12 +1,12 @@
 import { LatLng } from "../../LatLng";
-import { DirectionsPreferences } from "./DirectionPreferences";
+import { DirectionPreferences } from "./DirectionPreferences";
 
 export interface Direction {
   origin: LatLng;
   destination: LatLng;
   waypoints: LatLng[];
   travelMode: TravelMode;
-  preferences?: DirectionsPreferences;
+  preferences?: DirectionPreferences;
 }
 
 export enum TravelMode {
