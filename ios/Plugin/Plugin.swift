@@ -360,7 +360,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         DispatchQueue.main.async {
             if let customPolyline = self.customPolylines[polylineId] {
                 customPolyline.map = nil;
-                customPolyline.layer.removeFromSuperlayer()
+                // customPolyline.layer.removeFromSuperlayer()
                 self.customPolylines[polylineId] = nil;
                 call.resolve();
             } else {
@@ -369,93 +369,94 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         }
     }
 
-    @obj func addDirections(_ call: CAPPluginCall) {
+    @objc func addDirections() {
+    // @objc func addDirections(_ call: CAPPluginCall) {
+        // let mapId: String = call.getString("mapId", "")
+        print("Tony")
+
+        // DispatchQueue.main.async {
+        //     // guard customMapView = self.customWebView?.customMapViews[mapId] else {
+        //     //     call.reject("map not found")
+        //     //     return
+        //     // }
+
+        //     let origin = call.getObject("origin", JSObject())
+        //     let destination = call.getObject("destination", JSObject())
+        //     let waypoints = call.getArray("waypoints")?.capacitor.replacingNullValues() as? [JSObject?]
+        //     let travelMode = call.getString("travelMode", "DRIVING")
+        //     let avoid = call.getString("avoid", "NONE")
+        //     let unitSystem = call.getString("unitSystem", "METRIC")
+        //     let optimizeWaypoints = call.getBool("optimizeWaypoints", false)
+        //     let alternatives = call.getBool("alternatives", false)
+        //     let avoidFerries = call.getBool("avoidFerries", false)
+        //     let avoidHighways = call.getBool("avoidHighways", false)
+        //     let avoidIndoor = call.getBool("avoidIndoor", false)
+        //     let avoidTolls = call.getBool("avoidTolls", false)
+        //     let region = call.getString("region", "")
+        //     let transitMode = call.getString("transitMode", "")
+
+        //     let directionsRequest = (
+        //         origin: origin,
+        //         destination: destination,
+        //         waypoints: waypoints,
+        //         travelMode: travelMode,
+        //         avoid: avoid,
+        //         unitSystem: unitSystem,
+        //         optimizeWaypoints: optimizeWaypoints,
+        //         alternatives: alternatives,
+        //         avoidFerries: avoidFerries,
+        //         avoidHighways: avoidHighways,
+        //         avoidIndoor: avoidIndoor,
+        //         avoidTolls: avoidTolls,
+        //         region: region,
+        //         transitMode: transitMode
+        //     )
+
+        //     print("self.googleMapsDirections: \(self.googleMapsDirections)")
+        //     // self.googleMapsDirections.direction(directionsRequest: directionsRequest) { result in
+        //     //     switch result {
+        //     //     case .success(let directionsResponse):
+        //     //         let route = directionsResponse.routes[0]
+        //     //         let bounds = route.bounds
+        //     //         let legs = route.legs
+        //     //         let overviewPolyline = route.overviewPolyline
+        //     //         let summary = route.summary
+        //     //         let warnings = route.warnings
+        //     //         let waypointOrder = route.waypointOrder
+
+        //     //         let directionsResult = (
+        //     //             bounds: bounds,
+        //     //             legs: legs,
+        //     //             overviewPolyline: overviewPolyline,
+        //     //             summary: summary,
+        //     //             warnings: warnings,
+        //     //             waypointOrder: waypointOrder
+        //     //         )
+        //     //         print("directionsResult: \(directionsResult)")
+        //     //         call.resolve(directionsResult.toJSObject())
+        //     //     case .failure(let error):
+        //     //         print("error: \(error)")
+        //     //         call.reject(error.localizedDescription)
+        //     //     }
+        //     // }
+        // }
+    }
+
+    @objc func removeDirections(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "")
 
         DispatchQueue.main.async {
-            guard customMapView = self.customWebView?.customMapViews[mapId] else {
-                call.reject("map not found")
-                return
-            }
+            // guard customMapView = self.customWebView?.customMapViews[mapId] else {
+            //     call.reject("map not found")
+            //     return
+            // }
 
-            let origin = call.getObject("origin", JSObject())
-            let destination = call.getObject("destination", JSObject())
-            let waypoints = call.getArray("waypoints")?.capacitor.replacingNullValues() as? [JSObject?]
-            let travelMode = call.getString("travelMode", "DRIVING")
-            let avoid = call.getString("avoid", "NONE")
-            let unitSystem = call.getString("unitSystem", "METRIC")
-            let optimizeWaypoints = call.getBool("optimizeWaypoints", false)
-            let alternatives = call.getBool("alternatives", false)
-            let avoidFerries = call.getBool("avoidFerries", false)
-            let avoidHighways = call.getBool("avoidHighways", false)
-            let avoidIndoor = call.getBool("avoidIndoor", false)
-            let avoidTolls = call.getBool("avoidTolls", false)
-            let region = call.getString("region", "")
-            let transitMode = call.getString("transitMode", "")
+            let directions = GoogleMapsDirections()
 
-            let directionsRequest = DirectionsRequest(
-                origin: origin,
-                destination: destination,
-                waypoints: waypoints,
-                travelMode: travelMode,
-                avoid: avoid,
-                unitSystem: unitSystem,
-                optimizeWaypoints: optimizeWaypoints,
-                alternatives: alternatives,
-                avoidFerries: avoidFerries,
-                avoidHighways: avoidHighways,
-                avoidIndoor: avoidIndoor,
-                avoidTolls: avoidTolls,
-                region: region,
-                transitMode: transitMode
-            )
+            // directions.removeDirections()
 
-            let directions = Directions()
-
-            directions.getRoute(directionsRequest: directionsRequest) { result in
-                switch result {
-                case .success(let directionsResponse):
-                    let route = directionsResponse.routes[0]
-                    let bounds = route.bounds
-                    let legs = route.legs
-                    let overviewPolyline = route.overviewPolyline
-                    let summary = route.summary
-                    let warnings = route.warnings
-                    let waypointOrder = route.waypointOrder
-
-                    let directionsResult = DirectionsResult(
-                        bounds: bounds,
-                        legs: legs,
-                        overviewPolyline: overviewPolyline,
-                        summary: summary,
-                        warnings: warnings,
-                        waypointOrder: waypointOrder
-                    )
-                    print("directionsResult: \(directionsResult)")
-                    call.resolve(directionsResult.toJSObject())
-                case .failure(let error):
-                    print("error: \(error)")
-                    call.reject(error.localizedDescription)
-                }
-            }
+            call.resolve()
         }
-
-        @obj func removeDirections(_ call: CAPPluginCall) {
-            let mapId: String = call.getString("mapId", "")
-
-            DispatchQueue.main.async {
-                guard customMapView = self.customWebView?.customMapViews[mapId] else {
-                    call.reject("map not found")
-                    return
-                }
-
-                let directions = Directions()
-
-                directions.removeRoutes()
-
-                call.resolve()
-            }
-        }    
     }
 
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
@@ -624,5 +625,8 @@ private extension CapacitorGoogleMaps {
 extension CapacitorGoogleMaps: ImageCachable {
     var imageCache: ImageURLLoadable {
         NativeImageCache.shared
+    }
+    var googleMapsDirections: GoogleMapsDirections {
+        GoogleMapsDirections()
     }
 }

@@ -21,7 +21,7 @@ import ObjectMapper
 
 // MARK: - Response
 public extension GoogleMapsDirections {
-    public struct Response: Mappable {
+    struct Response: Mappable {
         public var status: StatusCode?
         public var errorMessage: String?
         
@@ -383,7 +383,7 @@ public extension Color {
 
      - parameter hexString: String value represents rgba values.
      */
-    public convenience init?(hexString: String) {
+    convenience init?(hexString: String) {
         assert(hexString.count == 6)
 
         guard hexString.hasPrefix("#") else {

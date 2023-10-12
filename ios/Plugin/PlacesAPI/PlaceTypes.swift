@@ -9,7 +9,7 @@
 import Foundation
 
 public extension GooglePlaces {
-    public enum PlaceType: String {        
+    enum PlaceType: String {        
         case geocode = "geocode"
         case address = "address"
         case establishment = "establishment"

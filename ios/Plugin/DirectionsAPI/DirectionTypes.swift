@@ -15,7 +15,7 @@ public extension GoogleMapsDirections {
      - OK:          No errors occurred; the address was successfully parsed and at least one geocode was returned.
      - ZeroResults: The geocode was successful but returned no results. This may occur if the geocoder was passed a non-existent address.
      */
-    public enum GeocoderStatus: String {
+    enum GeocoderStatus: String {
         case ok = "OK"
         case zeroResults = "ZERO_RESULTS"
     }
@@ -51,7 +51,7 @@ public extension GoogleMapsDirections {
      - park:                     Named park.
      - pointOfInterest:          Named point of interest. Typically, these "POI"s are prominent local entities that don't easily fit in another category, such as "Empire State Building" or "Statue of Liberty."
      */
-    public enum AddressType: String {
+    enum AddressType: String {
         case streetAddress = "street_address"
         case route = "route"
         case intersection = "intersection"
@@ -89,7 +89,7 @@ public extension GoogleMapsDirections {
      - bicycling: Bicycling directions via bicycle paths & preferred streets (where available).
      - transit:   Public transit routes (where available).
      */
-    public enum TravelMode: String {
+    enum TravelMode: String {
         case driving = "DRIVING"
         case walking = "WALKING"
         case bicycling = "BICYCLING"
@@ -104,7 +104,7 @@ public extension GoogleMapsDirections {
      - ferries:  Avoid Ferries
      - indoor:   Avoid indoor steps for walking and transit directions. Only requests that include an API key or a Google Maps APIs Premium Plan client ID will receive indoor steps by default.
      */
-    public enum RouteRestriction: String {
+    enum RouteRestriction: String {
         case tolls = "tolls"
         case highways = "highways"
         case ferries = "ferries"
@@ -119,7 +119,7 @@ public extension GoogleMapsDirections {
      - pessimistic: indicates that the returned duration_in_traffic should be longer than the actual travel time on most days, though occasional days with particularly bad traffic conditions may exceed this value.
      - optimistic:  indicates that the returned duration_in_traffic should be shorter than the actual travel time on most days, though occasional days with particularly good traffic conditions may be faster than this value.
      */
-    public enum TrafficMode: String {
+    enum TrafficMode: String {
         case bestGuess = "best_guess"
         case pessimistic = "pessimistic"
         case optimistic = "optimistic"
@@ -135,7 +135,7 @@ public extension GoogleMapsDirections {
      - tram:   Calculated route should prefer travel by tram and light rail.
      - rail:   Calculated route should prefer travel by train, tram, light rail, and subway. This is equivalent to transit_mode=train|tram|subway.
      */
-    public enum TransitMode: String {
+    enum TransitMode: String {
         case bus = "bus"
         case subway = "subway"
         case train = "train"
@@ -150,7 +150,7 @@ public extension GoogleMapsDirections {
      - lessWalking:    Calculated route should prefer limited amounts of walking.
      - fewerTransfers: Calculated route should prefer a limited number of transfers.
      */
-    public enum TransitRoutingPreference: String {
+    enum TransitRoutingPreference: String {
         case lessWalking = "less_walking"
         case fewerTransfers = "fewer_transfers"
     }
@@ -163,7 +163,7 @@ public extension GoogleMapsDirections {
      - metric:   Metric system. Textual distances are returned using kilometers and meters.
      - imperial: Imperial (English) system. Textual distances are returned using miles and feet.
      */
-    public enum Unit: String {
+    enum Unit: String {
         case metric = "metric"
         case imperial = "imperial"
     }
@@ -189,7 +189,7 @@ public extension GoogleMapsDirections {
      - funicular:                                                     A vehicle that is pulled up a steep incline by a cable. A Funicular typically consists of two cars, with each car acting as a counterweight for the other.
      - other:                                                         All other vehicles will return this type.
      */
-    public enum VehicleType: String {
+    enum VehicleType: String {
         case rail = "RAIL"
         case metroRail = "METRO_RAIL"
         case subway = "SUBWAY"

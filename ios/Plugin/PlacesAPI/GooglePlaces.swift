@@ -126,9 +126,9 @@ public class GooglePlaces: GoogleMapsService {
 // MARK: - Place Details
 public extension GooglePlaces {
     
-    public static let placeDetailsURLString = "https://maps.googleapis.com/maps/api/place/details/json"
+    static let placeDetailsURLString = "https://maps.googleapis.com/maps/api/place/details/json"
     
-    public class func placeDetails(forPlaceID placeID: String, extensions: String? = nil, language: String? = nil, completion: ((_ response: PlaceDetailsResponse?, _ error: NSError?) -> Void)?) {
+    class func placeDetails(forPlaceID placeID: String, extensions: String? = nil, language: String? = nil, completion: ((_ response: PlaceDetailsResponse?, _ error: NSError?) -> Void)?) {
         var requestParameters = baseRequestParameters + [
             "placeid" : placeID
         ]

@@ -11,7 +11,7 @@ import ObjectMapper
 
 // MARK: - PlaceAutocompleteResponse
 public extension GooglePlaces {
-    public struct PlaceAutocompleteResponse: Mappable {
+    struct PlaceAutocompleteResponse: Mappable {
         public var status: StatusCode?
         public var errorMessage: String?
         

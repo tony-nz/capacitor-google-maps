@@ -12,7 +12,7 @@ import ObjectMapper
 
 // Documentations: https://developers.google.com/maps/documentation/directions/
 
-public class GoogleMapsDirections {
+public class GoogleMapsDirections: GoogleMapsService {
 
     public static let baseURLString = "https://maps.googleapis.com/maps/api/directions/json"
     
