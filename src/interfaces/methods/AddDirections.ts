@@ -1,6 +1,9 @@
 import { LatLng } from "../models/LatLng";
-import { Direction, TravelMode } from "../models/GoogleMap/Direction/Direction";
-import { DirectionPreferences } from "../models/GoogleMap/Direction/DirectionPreferences";
+import { Direction } from "../models/GoogleMap/Direction/Direction";
+import {
+  DirectionPreferences,
+  TravelMode,
+} from "../models/GoogleMap/Direction/DirectionPreferences";
 
 export interface AddDirectionsOptions {
   mapId: string;
