@@ -16,5 +16,7 @@ Pod::Spec.new do |s|
   s.dependency 'GoogleMaps'
   s.dependency 'SDWebImage'
   s.dependency 'SVGKit'
+  s.dependency 'Alamofire', '~> 4'
+  s.dependency 'ObjectMapper', '~> 3'
   s.static_framework = true
 end
