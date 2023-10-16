@@ -13,6 +13,8 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
 
     var customPolylines = [String: CustomPolyline]();
 
+    var customDirections = [String: CustomDirection]();
+
     var customWebView: CustomWKWebView?
 
     @objc func initialize(_ call: CAPPluginCall) {
@@ -334,6 +336,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
 
     @objc func addPolyline(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "");
+        print("Adding polyline")
 
         DispatchQueue.main.async {
             guard let customMapView = self.customWebView?.customMapViews[mapId] else {
@@ -369,10 +372,15 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         }
     }
 
-    @objc func addDirections() {
+    @objc func addDirections(_ call: CAPPluginCall) {
     // @objc func addDirections(_ call: CAPPluginCall) {
         // let mapId: String = call.getString("mapId", "")
         print("Tony")
+        print("Adding directions")
+
+        DispatchQueue.main.async {
+            call.resolve();
+        }
 
         // DispatchQueue.main.async {
         //     // guard customMapView = self.customWebView?.customMapViews[mapId] else {
@@ -606,6 +614,20 @@ private extension CapacitorGoogleMaps {
             self.customPolylines[polyline.id] = polyline
 
             completion(polyline)
+        }
+    }
+
+    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSDirection>) {
+        DispatchQueue.main.async {
+            let directions = CustomDirection()
+
+            directions.updateFromJSObject(directionsData)
+
+            // directions.map = customMapView.GMapView
+
+            self.customDirections[directions.id] = directions
+
+            completion(directions)
         }
     }
     
