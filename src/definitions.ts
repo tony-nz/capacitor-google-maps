@@ -88,7 +88,7 @@ export interface CapacitorGoogleMapsPlugin {
 
   removePolyline(options: RemovePolylineOptions): Promise<void>;
 
-  addDirections(options: AddDirectionsOptions): Promise<AddDirectionsResult>;
+  addDirections(options: AddDirectionsOptions): Promise<void>;
 
   removeDirections(options: RemoveDirectionsOptions): Promise<void>;
 

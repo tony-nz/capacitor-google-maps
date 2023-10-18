@@ -216,7 +216,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
             }
         }
     }
-    
+
     @objc func addMarkers(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "")
 
@@ -635,7 +635,7 @@ private extension CapacitorGoogleMaps {
         }
     }
 
-    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<Direction>) {
+    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<CustomDirection>) {
         DispatchQueue.main.async {
             let directions = CustomDirection()
 

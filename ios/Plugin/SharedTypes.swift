@@ -71,3 +71,157 @@ public extension GoogleMapsService {
         }
     }
 }
+
+public extension CustomMapViewEvents {
+    
+    struct Direction {
+        let mapId: String
+        let origin: LatLng
+        let destination: LatLng
+        let waypoints: [LatLng]
+        let travelMode: TravelMode
+        let preferences: DirectionPreferences?
+
+        init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
+            self.mapId = mapId
+            self.origin = origin
+            self.destination = destination
+            self.waypoints = waypoints
+            self.travelMode = travelMode
+            self.preferences = preferences
+        }
+    }
+
+    struct LatLng {
+        let latitude: Double
+        let longitude: Double
+
+        init(latitude: Double, longitude: Double) {
+            self.latitude = latitude
+            self.longitude = longitude
+        }
+    }
+
+    enum TravelMode: String {
+        case driving = "DRIVING"
+        case walking = "WALKING"
+        case bicycling = "BICYCLING"
+        case transit = "TRANSIT"
+    }
+
+    struct DirectionPreferences {
+        let avoidHighways: Bool?
+        let avoidTolls: Bool?
+        let avoidFerries: Bool?
+        let avoidIndoor: Bool?
+        let avoidIndoorWalkways: Bool?
+        let travelMode: TravelMode?
+        let unitSystem: UnitSystem?
+        let waypoints: [LatLng]?
+    }
+
+    enum UnitSystem: String {
+        case metric = "METRIC"
+        case imperial = "IMPERIAL"
+    }
+
+    struct DirectionResult {
+        let bounds: LatLngBounds?
+        let fare: Fare?
+        let legs: [DirectionsLeg]?
+        let overviewPolyline: String?
+        let summary: String?
+        let warnings: [String]?
+        let waypointOrder: [Int]?
+    }
+
+    struct Fare {
+        let currency: String?
+        let value: Double?
+    }
+
+    struct DirectionsLeg {
+        let arrivalTime: String?
+        let departureTime: String?
+        let distance: Distance?
+        let duration: Duration?
+        let endAddress: String?
+        let endLocation: LatLng?
+        let startAddress: String?
+        let startLocation: LatLng?
+        let steps: [DirectionsStep]?
+        let viaWaypoint: [LatLng]?
+    }
+
+    struct Distance {
+        let text: String?
+        let value: Double?
+    }
+
+    struct Duration {
+        let text: String?
+        let value: Double?
+    }
+
+    struct DirectionsStep {
+        let distance: Distance?
+        let duration: Duration?
+        let endLocation: LatLng?
+        let instructions: String?
+        let polyline: String?
+        let startLocation: LatLng?
+        let steps: [DirectionsStep]?
+        let transitMode: TransitDetails?
+        let travelMode: TravelMode?
+    }
+    
+    struct TransitDetails {
+        let arrivalStop: TransitStop?
+        let arrivalTime: TransitTime?
+        let departureStop: TransitStop?
+        let departureTime: TransitTime?
+        let headsign: String?
+        let headway: Int?
+        let line: TransitLine?
+        let numStops: Int?
+    }
+
+    struct TransitStop {
+        let location: LatLng?
+        let name: String?
+    }
+
+    struct TransitTime {
+        let text: String?
+        let value: Int?
+    }
+
+    struct TransitLine {
+        let agencies: [TransitAgency]?
+        let color: String?
+        let icon: String?
+        let name: String?
+        let shortName: String?
+        let textColor: String?
+        let url: String?
+        let vehicle: TransitVehicle?
+    }
+
+    struct TransitAgency {
+        let name: String?
+        let phone: String?
+        let url: String?
+    }
+
+    struct TransitVehicle {
+        let icon: String?
+        let localIcon: String?
+        let name: String?
+        let type: String?
+    }
+
+    struct LatLngBounds {
+        let northeast: LatLng?
+        let southwest: LatLng?
+    }
+}
