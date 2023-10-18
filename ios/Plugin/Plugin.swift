@@ -2,23 +2,23 @@ import Foundation
 import Capacitor
 import GoogleMaps
 
-struct Direction {
-    let mapId: String
-    let origin: LatLng
-    let destination: LatLng
-    let waypoints: [LatLng]
-    let travelMode: TravelMode
-    let preferences: DirectionPreferences?
+// struct Direction {
+//     let mapId: String
+//     let origin: LatLng
+//     let destination: LatLng
+//     let waypoints: [LatLng]
+//     let travelMode: TravelMode
+//     let preferences: DirectionPreferences?
 
-    init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
-        self.mapId = mapId
-        self.origin = origin
-        self.destination = destination
-        self.waypoints = waypoints
-        self.travelMode = travelMode
-        self.preferences = preferences
-    }
-}
+//     init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
+//         self.mapId = mapId
+//         self.origin = origin
+//         self.destination = destination
+//         self.waypoints = waypoints
+//         self.travelMode = travelMode
+//         self.preferences = preferences
+//     }
+// }
 
 @objc(CapacitorGoogleMaps)
 public class CapacitorGoogleMaps: CustomMapViewEvents {
@@ -391,91 +391,44 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
     }
 
     @objc func addDirections(_ call: CAPPluginCall) {
-    // @objc func addDirections(_ call: CAPPluginCall) {
-        // let mapId: String = call.getString("mapId", "")
-        print("Tony")
+        let mapId: String = call.getString("mapId", "")
         print("Adding directions")
 
         DispatchQueue.main.async {
-            call.resolve();
+            guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+                call.reject("map not found")
+                return
+            }
+
+            // Google Maps Directions
+            GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
+            
+            let origin = GoogleMapsDirections.Place.stringDescription(address: "Davis Center, Waterloo, Canada")
+            let destination = GoogleMapsDirections.Place.stringDescription(address: "Conestoga Mall, Waterloo, Canada")
+            
+            // You can also use coordinates or placeID for a place
+            // let origin = Place.Coordinate(coordinate: LocationCoordinate2D(latitude: 43.4697354, longitude: -80.5397377))
+            // let origin = Place.PlaceID(id: "ChIJb9sw59k0K4gRZZlYrnOomfc")
+            
+            GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination) { (response, error) -> Void in
+                // Check Status Code
+                guard response?.status == GoogleMapsDirections.StatusCode.ok else {
+                    // Status Code is Not OK
+                    print(response?.errorMessage ?? "")
+                    return
+                }
+                
+                // Use .result or .geocodedWaypoints to access response details
+                // response will have same structure as what Google Maps Directions API returns
+                print("it has \(response?.routes.count ?? 0) routes")
+            }
         }
-
-        // DispatchQueue.main.async {
-        //     // guard customMapView = self.customWebView?.customMapViews[mapId] else {
-        //     //     call.reject("map not found")
-        //     //     return
-        //     // }
-
-        //     let origin = call.getObject("origin", JSObject())
-        //     let destination = call.getObject("destination", JSObject())
-        //     let waypoints = call.getArray("waypoints")?.capacitor.replacingNullValues() as? [JSObject?]
-        //     let travelMode = call.getString("travelMode", "DRIVING")
-        //     let avoid = call.getString("avoid", "NONE")
-        //     let unitSystem = call.getString("unitSystem", "METRIC")
-        //     let optimizeWaypoints = call.getBool("optimizeWaypoints", false)
-        //     let alternatives = call.getBool("alternatives", false)
-        //     let avoidFerries = call.getBool("avoidFerries", false)
-        //     let avoidHighways = call.getBool("avoidHighways", false)
-        //     let avoidIndoor = call.getBool("avoidIndoor", false)
-        //     let avoidTolls = call.getBool("avoidTolls", false)
-        //     let region = call.getString("region", "")
-        //     let transitMode = call.getString("transitMode", "")
-
-        //     let directionsRequest = (
-        //         origin: origin,
-        //         destination: destination,
-        //         waypoints: waypoints,
-        //         travelMode: travelMode,
-        //         avoid: avoid,
-        //         unitSystem: unitSystem,
-        //         optimizeWaypoints: optimizeWaypoints,
-        //         alternatives: alternatives,
-        //         avoidFerries: avoidFerries,
-        //         avoidHighways: avoidHighways,
-        //         avoidIndoor: avoidIndoor,
-        //         avoidTolls: avoidTolls,
-        //         region: region,
-        //         transitMode: transitMode
-        //     )
-
-        //     print("self.googleMapsDirections: \(self.googleMapsDirections)")
-        //     // self.googleMapsDirections.direction(directionsRequest: directionsRequest) { result in
-        //     //     switch result {
-        //     //     case .success(let directionsResponse):
-        //     //         let route = directionsResponse.routes[0]
-        //     //         let bounds = route.bounds
-        //     //         let legs = route.legs
-        //     //         let overviewPolyline = route.overviewPolyline
-        //     //         let summary = route.summary
-        //     //         let warnings = route.warnings
-        //     //         let waypointOrder = route.waypointOrder
-
-        //     //         let directionsResult = (
-        //     //             bounds: bounds,
-        //     //             legs: legs,
-        //     //             overviewPolyline: overviewPolyline,
-        //     //             summary: summary,
-        //     //             warnings: warnings,
-        //     //             waypointOrder: waypointOrder
-        //     //         )
-        //     //         print("directionsResult: \(directionsResult)")
-        //     //         call.resolve(directionsResult.toJSObject())
-        //     //     case .failure(let error):
-        //     //         print("error: \(error)")
-        //     //         call.reject(error.localizedDescription)
-        //     //     }
-        //     // }
-        // }
     }
 
     @objc func removeDirections(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "")
 
         DispatchQueue.main.async {
-            // guard customMapView = self.customWebView?.customMapViews[mapId] else {
-            //     call.reject("map not found")
-            //     return
-            // }
 
             let directions = GoogleMapsDirections()
 
@@ -635,19 +588,19 @@ private extension CapacitorGoogleMaps {
         }
     }
 
-    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<CustomDirection>) {
-        DispatchQueue.main.async {
-            let directions = CustomDirection()
+    // func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<CustomDirection>) {
+    //     DispatchQueue.main.async {
+    //         let directions = CustomDirection()
 
-            directions.updateFromJSObject(directionsData)
+    //         directions.updateFromJSObject(directionsData)
 
-            // directions.map = customMapView.GMapView
+    //         // directions.map = customMapView.GMapView
 
-            self.customDirections[directions.id] = directions
+    //         self.customDirections[directions.id] = directions
 
-            completion(directions)
-        }
-    }
+    //         completion(directions)
+    //     }
+    // }
     
     
 
