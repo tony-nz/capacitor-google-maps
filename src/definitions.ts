@@ -23,7 +23,7 @@ import {
   AddPolylineResult,
   RemovePolylineOptions,
   AddDirectionsOptions,
-  AddDirectionsResult,
+  // AddDirectionsResult,
   RemoveDirectionsOptions,
   // events
   DidTapInfoWindowCallback,
