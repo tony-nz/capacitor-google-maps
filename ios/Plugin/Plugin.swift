@@ -2,6 +2,24 @@ import Foundation
 import Capacitor
 import GoogleMaps
 
+struct Direction {
+    let mapId: String
+    let origin: LatLng
+    let destination: LatLng
+    let waypoints: [LatLng]
+    let travelMode: TravelMode
+    let preferences: DirectionPreferences?
+
+    init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
+        self.mapId = mapId
+        self.origin = origin
+        self.destination = destination
+        self.waypoints = waypoints
+        self.travelMode = travelMode
+        self.preferences = preferences
+    }
+}
+
 @objc(CapacitorGoogleMaps)
 public class CapacitorGoogleMaps: CustomMapViewEvents {
 
@@ -198,7 +216,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
             }
         }
     }
-
+    
     @objc func addMarkers(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "")
 
@@ -617,7 +635,7 @@ private extension CapacitorGoogleMaps {
         }
     }
 
-    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSDirection>) {
+    func addDirections(_ directionsData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<Direction>) {
         DispatchQueue.main.async {
             let directions = CustomDirection()
 
