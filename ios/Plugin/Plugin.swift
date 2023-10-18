@@ -399,28 +399,122 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                 call.reject("map not found")
                 return
             }
+            let origin1 = call.getObject("origin", JSObject())
+            let destination1 = call.getObject("destination", JSObject())
+            let preferences = call.getObject("preferences", JSObject())
+            let travelMode = call.getString("travelMode", "DRIVING")
 
             // Google Maps Directions
             GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
             
-            let origin = GoogleMapsDirections.Place.stringDescription(address: "Davis Center, Waterloo, Canada")
-            let destination = GoogleMapsDirections.Place.stringDescription(address: "Conestoga Mall, Waterloo, Canada")
+            // let origin = GoogleMapsDirections.Place.stringDescription(address: "Davis Center, Waterloo, Canada")
+            // let destination = GoogleMapsDirections.Place.stringDescription(address: "Conestoga Mall, Waterloo, Canada")
             
             // You can also use coordinates or placeID for a place
             // let origin = Place.Coordinate(coordinate: LocationCoordinate2D(latitude: 43.4697354, longitude: -80.5397377))
             // let origin = Place.PlaceID(id: "ChIJb9sw59k0K4gRZZlYrnOomfc")
             
-            GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination) { (response, error) -> Void in
-                // Check Status Code
-                guard response?.status == GoogleMapsDirections.StatusCode.ok else {
-                    // Status Code is Not OK
-                    print(response?.errorMessage ?? "")
-                    return
+            let waypoints = preferences["waypoints"] ?? []
+            print("waypoints: \(waypoints)")
+
+            if let waypoints = preferences["waypoints"] as? [[String: Any]] {
+                // var directions: [GoogleMapsDirections.Response.Route] = []
+                // var directions: [[[String: Any]]] = []
+                var directions: [Any] = []
+                var groupedWaypoints: [[[String: Any]]] = []
+
+                for i in stride(from: 0, to: waypoints.count, by: 10) {
+                    let endIndex = min(i + 10, waypoints.count)
+                    var group = Array(waypoints[i..<endIndex])
+
+                    if i > 0 {
+                        group.insert(groupedWaypoints.last?.last ?? [:], at: 0)
+                    }
+
+                    groupedWaypoints.append(group)
                 }
-                
-                // Use .result or .geocodedWaypoints to access response details
-                // response will have same structure as what Google Maps Directions API returns
-                print("it has \(response?.routes.count ?? 0) routes")
+
+                print(groupedWaypoints)
+           
+                for group in groupedWaypoints {
+                    if let firstWaypoint = group.first, let lastWaypoint = group.last {
+                        var waypointsInBetween: [[String: Any]] = []
+                        var waypointsPlacesInBetween: [GoogleMapsDirections.Place] = []
+
+                        if group.count > 2 {
+                            waypointsInBetween = Array(group[1..<group.count - 1])
+                        }
+                        if group.count > 2 {
+                            // Extract latitude and longitude for waypointsInBetween
+                            for waypoint in waypointsInBetween {
+                                if let latitude = waypoint["latitude"] as? Double, let longitude = waypoint["longitude"] as? Double {
+                                    let place = GoogleMapsDirections.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                    waypointsPlacesInBetween.append(place)
+                                }
+                            }
+                        }
+                        if let firstLatitude = firstWaypoint["latitude"] as? Double,
+                           let firstLongitude = firstWaypoint["longitude"] as? Double,
+                           let lastLatitude = lastWaypoint["latitude"] as? Double,
+                           let lastLongitude = lastWaypoint["longitude"] as? Double {
+                            let origin = GoogleMapsDirections.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: firstLatitude, longitude: firstLongitude))
+                            let destination = GoogleMapsDirections.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: lastLatitude, longitude: lastLongitude))
+        
+                            if !waypointsInBetween.isEmpty {
+                                 GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination, wayPoints: waypointsPlacesInBetween) { (response, error) -> Void in
+                                    // Check Status Code
+                                    guard response?.status == GoogleMapsDirections.StatusCode.ok else {
+                                        // Status Code is Not OK
+                                        print(response?.errorMessage ?? "")
+                                        return
+                                    }
+                                    
+                                    // Use .result or .geocodedWaypoints to access response details
+                                    // response will have same structure as what Google Maps Directions API returns
+                                    print("it has \(response?.routes.count ?? 0) routes")
+                                    print("routes \(response?.routes ?? [])")
+                                    // add routes to directions
+                                    // directions.append(response?.routes ?? [])
+                                    if let routes = response?.routes {
+                                        directions.append(contentsOf: routes)
+                                    }
+                                }
+                            } else {
+                                GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination) { (response, error) -> Void in
+                                    // Check Status Code
+                                    guard response?.status == GoogleMapsDirections.StatusCode.ok else {
+                                        // Status Code is Not OK
+                                        print(response?.errorMessage ?? "")
+                                        return
+                                    }
+                                    
+                                    // Use .result or .geocodedWaypoints to access response details
+                                    // response will have same structure as what Google Maps Directions API returns
+                                    print("it has \(response?.routes.count ?? 0) routes")
+                                    print("routes \(response?.routes ?? [])")
+                                    // directions.append(response?.routes ?? [])
+                                    if let routes = response?.routes {
+                                        directions.append(contentsOf: routes)
+                                    }
+                                }
+                            }
+                        } else {
+                            // Handle the case where latitude or longitude is not present or cannot be converted to Double
+                        }
+
+                        // print("Origin: \(firstWaypoint)")
+                        
+                        // if !waypointsInBetween.isEmpty {
+                        //     print("Waypoints in between:")
+                        //     for waypoint in waypointsInBetween {
+                        //         print(waypoint)
+                        //     }
+                        // }
+                        
+                        // print("Destination: \(lastWaypoint)")
+                    }
+                }
+                print("directions \(directions)")
             }
         }
     }
