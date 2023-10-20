@@ -58,5 +58,6 @@ export { Polyline } from "./models/GoogleMap/Polyline/Polyline";
 export { PolylinePreferences } from "./models/GoogleMap/Polyline/PolylinePreferences";
 export { Direction } from "./models/GoogleMap/Direction/Direction";
 export { DirectionPreferences } from "./models/GoogleMap/Direction/DirectionPreferences";
+export { DirectionResults } from "./models/GoogleMap/Direction/DirectionResults";
 export { BoundingRect } from "./models/BoundingRect";
 export { LatLng } from "./models/LatLng";

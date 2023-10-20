@@ -2,7 +2,7 @@ import Foundation
 import GoogleMaps
 import Capacitor
 
-class CustomDirection {
+class CustomDirection: CustomMapViewEvents {
     var id: String! = NSUUID().uuidString.lowercased()
     var mapId: String! = ""
     var origin: CLLocationCoordinate2D! = CLLocationCoordinate2D()
@@ -47,85 +47,109 @@ class CustomDirection {
 
     }
     
-    public static func getResultForDirection(_ routes: [DirectionResults], mapId: String) -> PluginCallResultData {
+    public static func getResultForDirection(_ directionResults: [DirectionResults], mapId: String) -> [PluginCallResultData] {
         var results: [PluginCallResultData] = []
 
-        for route in routes {
-            // Process each route
-            let result: PluginCallResultData = [
-                "route": [
-                    "mapId": mapId,
-                    "summary": route.summary ?? "",
-                    "waypointOrder": route.waypointOrder ?? [],
-                    "overviewPolylinePoints": route.overviewPolylinePoints ?? "",
-                    "copyrights": route.copyrights ?? "",
-                    "warnings": route.warnings,
-                    "fare": route.fare ?? [:],  // You can adjust this as needed
-                    "legs": []
-                ]
-            ]
-
-            // Process legs within the route
-            for leg in route.legs {
-                let legData: PluginCallResultData = [
-                    "startLocation": [
-                        "latitude": leg.startLocation.latitude,
-                        "longitude": leg.startLocation.longitude
-                    ],
-                    "endLocation": [
-                        "latitude": leg.endLocation.latitude,
-                        "longitude": leg.endLocation.longitude
-                    ],
-                    "startAddress": leg.startAddress,
-                    "endAddress": leg.endAddress,
-                    "steps": [],
-                    "distance": [
-                        "text": leg.distance?.text ?? "",
-                        "value": leg.distance?.value ?? 0.0
-                    ],
-                    "duration": [
-                        "text": leg.duration?.text ?? "",
-                        "value": leg.duration?.value ?? 0.0
+        for directionResult in directionResults {
+            for route in directionResult.routes {
+                // Process each route
+                var result: PluginCallResultData = [
+                    "route": [
+                        "summary": route.summary ?? "",
+                        "waypointOrder": route.waypointOrder ?? [],
+                        "overviewPolylinePoints": route.overviewPolylinePoints ?? "",
+                        "copyrights": route.copyrights ?? "",
+                        "warnings": route.warnings,
+                        "fare": route.fare ?? [:],  // You can adjust this as needed
+                        "legs": []  // Initialize as an empty array
                     ]
                 ]
 
-                // Process steps within the leg
-                for step in leg.steps {
-                    let stepData: PluginCallResultData = [
-                        "htmlInstructions": step.htmlInstructions ?? "",
-                        "distance": [
-                            "text": step.distance?.text ?? "",
-                            "value": step.distance?.value ?? 0.0
-                        ],
-                        "duration": [
-                            "text": step.duration?.text ?? "",
-                            "value": step.duration?.value ?? 0.0
-                        ],
-                        "startLocation": [
-                            "latitude": step.startLocation.latitude,
-                            "longitude": step.startLocation.longitude
-                        ],
-                        "endLocation": [
-                            "latitude": step.endLocation.latitude,
-                            "longitude": step.endLocation.longitude
-                        ],
-                        "polylinePoints": step.polylinePoints ?? "",
-                        "travelMode": step.travelMode.rawValue,
-                        "maneuver": step.maneuver ?? "",
-                        "transitDetails": step.transitDetails ?? [:] // You can adjust this as needed
+                // Process legs within the route
+                var legs: [PluginCallResultData] = [] // Initialize as a regular array
+                for leg in route.legs {
+                    var legData: PluginCallResultData = [
+                        "startAddress": leg.startAddress ?? "",
+                        "endAddress": leg.endAddress ?? "",
+                        "steps": []  // Initialize as an empty array
                     ]
 
-                    legData["steps"]?.append(stepData)
+                    if let startLocation = leg.startLocation, let endLocation = leg.endLocation {
+                        legData["startLocation"] = [
+                            "latitude": startLocation.latitude,
+                            "longitude": startLocation.longitude
+                        ]
+                        legData["endLocation"] = [
+                            "latitude": endLocation.latitude,
+                            "longitude": endLocation.longitude
+                        ]
+                    }
+
+                    if let distance = leg.distance {
+                        legData["distance"] = [
+                            "text": distance.text ?? "",
+                            "value": distance.value ?? 0.0
+                        ]
+                    }
+
+                    if let duration = leg.duration {
+                        legData["duration"] = [
+                            "text": duration.text ?? "",
+                            "value": duration.value ?? 0.0
+                        ]
+                    }
+
+                    // Process steps within the leg
+                    var steps: [PluginCallResultData] = [] // Initialize as a regular array
+                    for step in leg.steps {
+                        var stepData: PluginCallResultData = [
+                            "htmlInstructions": step.htmlInstructions ?? "",
+                            "distance": [
+                                "text": step.distance?.text ?? "",
+                                "value": step.distance?.value ?? 0.0
+                            ],
+                            "duration": [
+                                "text": step.duration?.text ?? "",
+                                "value": step.duration?.value ?? 0.0
+                            ]
+                        ]
+
+                        if let startLocation = step.startLocation, let endLocation = step.endLocation {
+                            stepData["startLocation"] = [
+                                "latitude": startLocation.latitude,
+                                "longitude": startLocation.longitude
+                            ]
+                            stepData["endLocation"] = [
+                                "latitude": endLocation.latitude,
+                                "longitude": endLocation.longitude
+                            ]
+                        }
+                        
+                        if let travelMode = step.travelMode {
+                            stepData["travelMode"] = travelMode.rawValue
+                        } else {
+                            stepData["travelMode"] = "" // Provide a default value if it's nil
+                        }
+
+                        stepData["polylinePoints"] = step.polylinePoints ?? ""
+                        stepData["maneuver"] = step.maneuver ?? ""
+                        stepData["transitDetails"] = step.transitDetails ?? [:] // You can adjust this as needed
+
+                        steps.append(stepData)
+                    }
+
+                    legData["steps"] = steps // Set the "steps" array
+                    legs.append(legData)
                 }
 
-                result["legs"]?.append(legData)
+                result["legs"] = legs // Set the "legs" array
+                results.append(result)
             }
-
-            results.append(result)
         }
 
         return results
     }
+
 
 // [
 //   TonyNzCapacitorGoogleMaps.GoogleMapsDirections.Response.Route(

@@ -125,32 +125,47 @@ public extension CustomMapViewEvents {
         case imperial = "IMPERIAL"
     }
 
-    struct DirectionResult {
-        let bounds: LatLngBounds?
-        let fare: Fare?
-        let legs: [DirectionsLeg]?
-        let overviewPolyline: String?
+    // Direction results
+
+    struct DirectionResults {
+        let routes: [Route]
+    }
+
+    struct Route {
         let summary: String?
-        let warnings: [String]?
+        let legs: [Leg]
         let waypointOrder: [Int]?
+        let overviewPolylinePoints: String?
+        let bounds: Bounds?
+        let copyrights: String?
+        let warnings: [String]?
+        let fare: Fare?
     }
 
-    struct Fare {
-        let currency: String?
-        let value: Double?
-    }
-
-    struct DirectionsLeg {
-        let arrivalTime: String?
-        let departureTime: String?
+    struct Leg {
+        let steps: [Step]
         let distance: Distance?
         let duration: Duration?
-        let endAddress: String?
-        let endLocation: LatLng?
+        let durationInTraffic: Duration?
+        let arrivalTime: String?
+        let departureTime: String?
+        let startLocation: LocationCoordinate2D?
+        let endLocation: LocationCoordinate2D?
         let startAddress: String?
-        let startLocation: LatLng?
-        let steps: [DirectionsStep]?
-        let viaWaypoint: [LatLng]?
+        let endAddress: String?
+    }
+
+    struct Step {
+        let htmlInstructions: String?
+        let distance: Distance?
+        let duration: Duration?
+        let startLocation: LocationCoordinate2D?
+        let endLocation: LocationCoordinate2D?
+        let polylinePoints: String?
+        let steps: [Step]?
+        let travelMode: TravelMode?
+        let maneuver: String?
+        let transitDetails: TransitDetails?
     }
 
     struct Distance {
@@ -163,18 +178,21 @@ public extension CustomMapViewEvents {
         let value: Double?
     }
 
-    struct DirectionsStep {
-        let distance: Distance?
-        let duration: Duration?
-        let endLocation: LatLng?
-        let instructions: String?
-        let polyline: String?
-        let startLocation: LatLng?
-        let steps: [DirectionsStep]?
-        let transitMode: TransitDetails?
-        let travelMode: TravelMode?
+    struct LocationCoordinate2D {
+        let latitude: Double
+        let longitude: Double
     }
-    
+
+    struct Bounds {
+        let northeast: LocationCoordinate2D?
+        let southwest: LocationCoordinate2D?
+    }
+
+    struct Fare {
+        let currency: String?
+        let value: Double?
+    }
+
     struct TransitDetails {
         let arrivalStop: TransitStop?
         let arrivalTime: TransitTime?
@@ -187,7 +205,7 @@ public extension CustomMapViewEvents {
     }
 
     struct TransitStop {
-        let location: LatLng?
+        let location: LocationCoordinate2D?
         let name: String?
     }
 
@@ -220,8 +238,4 @@ public extension CustomMapViewEvents {
         let type: String?
     }
 
-    struct LatLngBounds {
-        let northeast: LatLng?
-        let southwest: LatLng?
-    }
 }
