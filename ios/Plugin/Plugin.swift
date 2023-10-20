@@ -447,6 +447,8 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
 
     @objc func addDirections(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "")
+        let dispatchGroup = DispatchGroup()
+
         print("Adding directions")
 
         DispatchQueue.main.async {
@@ -461,7 +463,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
             GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
             
             let waypoints = preferences["waypoints"] ?? []
-            print("waypoints: \(waypoints)")
 
             if let waypoints = preferences["waypoints"] as? [[String: Any]] {
                 var directions: [Any] = []
@@ -505,7 +506,8 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                             let destination = GoogleMapsDirections.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: lastLatitude, longitude: lastLongitude))
         
                             if !waypointsInBetween.isEmpty {
-                                 GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination, wayPoints: waypointsPlacesInBetween) { (response, error) -> Void in
+                                dispatchGroup.enter()
+                                GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination, wayPoints: waypointsPlacesInBetween) { (response, error) -> Void in
                                     // Check Status Code
                                     guard response?.status == GoogleMapsDirections.StatusCode.ok else {
                                         // Status Code is Not OK
@@ -515,40 +517,15 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                                     
                                     // Use .result or .geocodedWaypoints to access response details
                                     // response will have same structure as what Google Maps Directions API returns
-                                    print("it has \(response?.routes.count ?? 0) routes")
-                                    if let routes = response?.routes {
-                                        for route in routes {
-                                            // Loop through steps within the route
-                                            for step in route.legs.first?.steps ?? [] {
-                                                if let polylinePoints = step.polylinePoints {
-                                                    // Decode the polyline points into an array of CLLocationCoordinate2D
-                                                    let decodedCoordinates = decodePolyline(polylinePoints)
-                                                    let polylinePreferences: JSObject = [
-                                                        "color": "#ff0000",
-                                                        "width": 5,
-                                                        "isGeodesic": true
-                                                    ]
-
-                                                    print("decodedCoordinates \(decodedCoordinates)")
-                                                    
-                                                    self.addPolyline([
-                                                        "mapId": mapId,
-                                                        "path": decodedCoordinates,
-                                                        "preferences": [
-                                                            "color": "#ff0000",
-                                                            "width": 5,
-                                                            "isGeodesic": true
-                                                        ]
-                                                    ], customMapView: customMapView) { polyline in
-                                                        // call.resolve(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
-                                                        print(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    print("routes \(response?.routes ?? [])")
+                                    if let routes = response?.routes, !routes.isEmpty {
+                                        // At this point, 'routes' is a non-empty array of dictionaries
+                                        directions.append(contentsOf: routes)
                                     }
+                                    dispatchGroup.leave()
                                 }
                             } else {
+                                dispatchGroup.enter()
                                 GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination) { (response, error) -> Void in
                                     // Check Status Code
                                     guard response?.status == GoogleMapsDirections.StatusCode.ok else {
@@ -560,56 +537,29 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                                     // Use .result or .geocodedWaypoints to access response details
                                     // response will have same structure as what Google Maps Directions API returns
                                     print("it has \(response?.routes.count ?? 0) routes")
-                                    if let routes = response?.routes {
-                                        for route in routes {
-                                            // Loop through steps within the route
-                                            for step in route.legs.first?.steps ?? [] {
-                                                if let polylinePoints = step.polylinePoints {
-                                                    // Decode the polyline points into an array of CLLocationCoordinate2D
-                                                    let decodedCoordinates = decodePolyline(polylinePoints)
-                                                    let polylinePreferences: JSObject = [
-                                                        "color": "#ff0000",
-                                                        "width": 5,
-                                                        "isGeodesic": true
-                                                    ]
-
-                                                    print("decodedCoordinates \(decodedCoordinates)")
-                                                    
-                                                    self.addPolyline([
-                                                        "mapId": mapId,
-                                                        "path": decodedCoordinates,
-                                                        "preferences": [
-                                                            "color": "#ff0000",
-                                                            "width": 5,
-                                                            "isGeodesic": true
-                                                        ]
-                                                    ], customMapView: customMapView) { polyline in
-                                                        // call.resolve(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
-                                                        print(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    if let routes = response?.routes, !routes.isEmpty {
+                                        // At this point, 'routes' is a non-empty array of dictionaries
+                                        directions.append(contentsOf: routes)
                                     }
+                                    dispatchGroup.leave()
                                 }
                             }
                         } else {
                             // Handle the case where latitude or longitude is not present or cannot be converted to Double
                         }
 
-                        // print("Origin: \(firstWaypoint)")
-                        
-                        // if !waypointsInBetween.isEmpty {
-                        //     print("Waypoints in between:")
-                        //     for waypoint in waypointsInBetween {
-                        //         print(waypoint)
-                        //     }
-                        // }
-                        
-                        // print("Destination: \(lastWaypoint)")
                     }
                 }
-                print("directions \(directions)")
+                dispatchGroup.notify(queue: .main) {
+                    // All routes have been collected here
+                    // print("All directions collected: \(directions)")
+                    // let resultData: PluginCallResultData = [
+                    //     "routes": directions
+                    // ]
+
+                    // call.resolve(resultData)
+                    // call.resolve(CustomDirection.getResultForDirection(directions, mapId: mapId))
+                }
             }
         }
     }
@@ -765,6 +715,7 @@ private extension CapacitorGoogleMaps {
 
     func addPolyline(_ polylineData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSPolyline>) {
         DispatchQueue.main.async {
+            print("IN HERE")
             let polyline = CustomPolyline()
 
             polyline.updateFromJSObject(polylineData)
