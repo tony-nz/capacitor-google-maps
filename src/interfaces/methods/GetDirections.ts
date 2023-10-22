@@ -12,18 +12,18 @@ import {
 export interface GetDirectionsOptions {
   origin: LatLng;
   destination: LatLng;
-  waypoints: LatLng[];
-  travelMode: TravelMode;
-  alternatives: Boolean;
-  avoid: [RouteRestriction];
-  language: String;
-  units: UnitSystem;
-  region: String;
-  arrivalTime: Date;
-  departureTime: Date;
-  trafficModel: TrafficMode;
-  transitMode: TransitMode;
-  transitRoutingPreference: TransitRoutingPreference;
+  waypoints?: LatLng[];
+  travelMode?: TravelMode;
+  alternatives?: Boolean;
+  avoid?: [RouteRestriction];
+  language?: String;
+  units?: UnitSystem;
+  region?: String;
+  arrivalTime?: Date;
+  departureTime?: Date;
+  trafficModel?: TrafficMode;
+  transitMode?: TransitMode;
+  transitRoutingPreference?: TransitRoutingPreference;
 }
 
 export interface GetDirectionsResult {
