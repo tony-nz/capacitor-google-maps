@@ -431,67 +431,77 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
     }
 
     @objc func getDirections(_ call: CAPPluginCall) {
-        print("Getting directions")
+    print("Getting directions")
 
-        DispatchQueue.main.async {
-            let alternatives = call.getObject("alternatives") as? JSObject
-            let arrivalTime = call.getObject("arrivalTime") as? JSObject
-            let avoid = call.getObject("avoid") as? JSObject
-            let departureTime = call.getObject("departureTime") as? JSObject
-            let language = call.getObject("language") as? JSObject
-            let region = call.getObject("region") as? JSObject
-            let transitMode = call.getObject("transitMode") as? JSObject
-            let trafficModel = call.getObject("trafficModel") as? JSObject
-            let transitRoutingPreference = call.getObject("transitRoutingPreference") as? JSObject
-            let travelMode = call.getObject("travelMode") as? JSObject
-            let units = call.getObject("units") as? JSObject
-            let wayPoints = call.getArray("wayPoints")?.capacitor.replacingNullValues() as? [GoogleMapsDirections.Place] ?? [GoogleMapsDirections.Place]()
-            let origin = call.getObject("origin") as? GoogleMapsDirections.Place
-            let destination = call.getObject("destination") as? GoogleMapsDirections.Place
-            
-            print("origin \(origin)")
-            if (origin != nil && destination != nil) {
+    DispatchQueue.main.async {
+        // Retrieve data from the call
+        let origin = call.getObject("origin") as? GoogleMapsService.Place ?? .stringDescription(address: "")
+        let destination = call.getObject("destination") as? GoogleMapsService.Place ?? .stringDescription(address: "")
 
-                if let originData = directionData["origin"] as? GoogleMapsService.Place {
-                    origin = originData
+        let travelMode: GoogleMapsDirections.TravelMode = (call.getObject("travelMode") as? String)
+            .flatMap { GoogleMapsDirections.TravelMode(rawValue: $0) } ?? .driving
+
+        let alternatives = call.getObject("alternatives") as? JSObject
+        let arrivalTime = call.getObject("arrivalTime") as? JSObject
+        let avoid = call.getObject("avoid") as? JSObject
+        let departureTime = call.getObject("departureTime") as? JSObject
+        let language = call.getObject("language") as? JSObject
+        let region = call.getObject("region") as? JSObject
+        let transitMode = call.getObject("transitMode") as? JSObject
+        let trafficModel = call.getObject("trafficModel") as? JSObject
+        let transitRoutingPreference = call.getObject("transitRoutingPreference") as? JSObject
+        let units = call.getObject("units") as? JSObject
+
+        var waypoints: [GoogleMapsService.Place] = []
+        if let waypointsArray = call.getArray("waypoints") {
+            for waypoint in waypointsArray {
+                if let waypointData = waypoint as? GoogleMapsService.Place {
+                    waypoints.append(waypointData)
                 } else {
-                    origin = .stringDescription(address: "")
+                    waypoints.append(.stringDescription(address: ""))
                 }
+            }
+        }
 
-                if let destinationData = directionData["destination"] as? GoogleMapsService.Place {
-                    destination = destinationData
-                } else {
-                    destination = .stringDescription(address: "")
-                }
+        // Handle other parameters and configuration
 
-                travelMode = GoogleMapsDirections.TravelMode(rawValue: directionData["travelMode"] as? String ?? "DRIVING") ?? .driving
-                waypoints = directionData["waypoints"] as? [GoogleMapsDirections.Place] ?? []
+        // Example: travelMode = GoogleMapsDirections.TravelMode(rawValue: directionData["travelMode"] as? String ?? "DRIVING") ?? .driving
 
+        // Google Maps Directions
+        GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
 
-                // // Google Maps Directions
-                GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
-
-                GoogleMapsDirections.direction(fromOrigin: origin, toDestination: destination, travelMode: travelMode, wayPoints: waypoints) { (response, error) -> Void in
-                    // Check Status Code
-                    guard response?.status == GoogleMapsDirections.StatusCode.ok else {
-                        // Status Code is Not OK
-                        print(response?.errorMessage ?? "")
-                        return
-                    }
-                    
-                    // Use .result or .geocodedWaypoints to access response details
-                    // response will have same structure as what Google Maps Directions API returns
-                    print("routes \(response?.routes ?? [])")
-                    call.resolve(response!)
-                    // call.resolve(CustomDirection.getResultForDirection(response?.routes, mapId: mapId))
-                }
-            } else {
-                // Handle cases where origin or destination are missing or not properly formatted
-                call.reject("Invalid origin or destination")
+        GoogleMapsDirections.direction(
+            fromOrigin: origin,
+            toDestination: destination,
+            travelMode: travelMode,
+            wayPoints: waypoints
+        ) { (response, error) -> Void in
+            // Check Status Code
+            guard response?.status == GoogleMapsDirections.StatusCode.ok else {
+                // Status Code is Not OK
+                print(response?.errorMessage ?? "")
+                return
             }
 
+            // Example: Create a dictionary to represent the response data
+            let responseData: [String: Any] = [
+                "response": response,
+                // "routes": response?.routes.map { route in
+                //     // Map route information as needed
+                //     return [
+                //         "duration": route.duration,
+                //         "distance": route.distance,
+                //         // Add more properties as necessary
+                //     ]
+                // }
+            ]
+
+            call.resolve(responseData)
+            // call.resolve(CustomDirection.getResultForDirection(response?.routes, mapId: mapId))
         }
     }
+}
+
 
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
         setCallbackIdForEvent(call: call, eventName: CustomMapView.EVENT_DID_TAP_INFO_WINDOW);
