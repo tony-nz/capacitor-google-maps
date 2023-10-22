@@ -72,170 +72,57 @@ public extension GoogleMapsService {
     }
 }
 
-public extension CustomMapViewEvents {
+// public extension CustomMapViewEvents {
     
-    struct Direction {
-        let mapId: String
-        let origin: LatLng
-        let destination: LatLng
-        let waypoints: [LatLng]
-        let travelMode: TravelMode
-        let preferences: DirectionPreferences?
+//     struct Direction {
+//         let mapId: String
+//         let origin: LatLng
+//         let destination: LatLng
+//         let waypoints: [LatLng]
+//         let travelMode: TravelMode
+//         let preferences: DirectionPreferences?
 
-        init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
-            self.mapId = mapId
-            self.origin = origin
-            self.destination = destination
-            self.waypoints = waypoints
-            self.travelMode = travelMode
-            self.preferences = preferences
-        }
-    }
+//         init(mapId: String, origin: LatLng, destination: LatLng, waypoints: [LatLng], travelMode: TravelMode, preferences: DirectionPreferences?) {
+//             self.mapId = mapId
+//             self.origin = origin
+//             self.destination = destination
+//             self.waypoints = waypoints
+//             self.travelMode = travelMode
+//             self.preferences = preferences
+//         }
+//     }
 
-    struct LatLng {
-        let latitude: Double
-        let longitude: Double
+//     struct LatLng {
+//         let latitude: Double
+//         let longitude: Double
 
-        init(latitude: Double, longitude: Double) {
-            self.latitude = latitude
-            self.longitude = longitude
-        }
-    }
+//         init(latitude: Double, longitude: Double) {
+//             self.latitude = latitude
+//             self.longitude = longitude
+//         }
+//     }
 
-    enum TravelMode: String {
-        case driving = "DRIVING"
-        case walking = "WALKING"
-        case bicycling = "BICYCLING"
-        case transit = "TRANSIT"
-    }
+//     enum TravelMode: String {
+//         case driving = "DRIVING"
+//         case walking = "WALKING"
+//         case bicycling = "BICYCLING"
+//         case transit = "TRANSIT"
+//     }
 
-    struct DirectionPreferences {
-        let avoidHighways: Bool?
-        let avoidTolls: Bool?
-        let avoidFerries: Bool?
-        let avoidIndoor: Bool?
-        let avoidIndoorWalkways: Bool?
-        let travelMode: TravelMode?
-        let unitSystem: UnitSystem?
-        let waypoints: [LatLng]?
-    }
+//     struct DirectionPreferences {
+//         let avoidHighways: Bool?
+//         let avoidTolls: Bool?
+//         let avoidFerries: Bool?
+//         let avoidIndoor: Bool?
+//         let avoidIndoorWalkways: Bool?
+//         let travelMode: TravelMode?
+//         let unitSystem: UnitSystem?
+//         let waypoints: [LatLng]?
+//     }
 
-    enum UnitSystem: String {
-        case metric = "METRIC"
-        case imperial = "IMPERIAL"
-    }
+//     enum UnitSystem: String {
+//         case metric = "METRIC"
+//         case imperial = "IMPERIAL"
+//     }
 
-    // Direction results
-
-    struct DirectionResults {
-        let routes: [Route]
-    }
-
-    struct Route {
-        let summary: String?
-        let legs: [Leg]
-        let waypointOrder: [Int]?
-        let overviewPolylinePoints: String?
-        let bounds: Bounds?
-        let copyrights: String?
-        let warnings: [String]?
-        let fare: Fare?
-    }
-
-    struct Leg {
-        let steps: [Step]
-        let distance: Distance?
-        let duration: Duration?
-        let durationInTraffic: Duration?
-        let arrivalTime: String?
-        let departureTime: String?
-        let startLocation: LocationCoordinate2D?
-        let endLocation: LocationCoordinate2D?
-        let startAddress: String?
-        let endAddress: String?
-    }
-
-    struct Step {
-        let htmlInstructions: String?
-        let distance: Distance?
-        let duration: Duration?
-        let startLocation: LocationCoordinate2D?
-        let endLocation: LocationCoordinate2D?
-        let polylinePoints: String?
-        let steps: [Step]?
-        let travelMode: TravelMode?
-        let maneuver: String?
-        let transitDetails: TransitDetails?
-    }
-
-    struct Distance {
-        let text: String?
-        let value: Double?
-    }
-
-    struct Duration {
-        let text: String?
-        let value: Double?
-    }
-
-    struct LocationCoordinate2D {
-        let latitude: Double
-        let longitude: Double
-    }
-
-    struct Bounds {
-        let northeast: LocationCoordinate2D?
-        let southwest: LocationCoordinate2D?
-    }
-
-    struct Fare {
-        let currency: String?
-        let value: Double?
-    }
-
-    struct TransitDetails {
-        let arrivalStop: TransitStop?
-        let arrivalTime: TransitTime?
-        let departureStop: TransitStop?
-        let departureTime: TransitTime?
-        let headsign: String?
-        let headway: Int?
-        let line: TransitLine?
-        let numStops: Int?
-    }
-
-    struct TransitStop {
-        let location: LocationCoordinate2D?
-        let name: String?
-    }
-
-    struct TransitTime {
-        let text: String?
-        let value: Int?
-    }
-
-    struct TransitLine {
-        let agencies: [TransitAgency]?
-        let color: String?
-        let icon: String?
-        let name: String?
-        let shortName: String?
-        let textColor: String?
-        let url: String?
-        let vehicle: TransitVehicle?
-    }
-
-    struct TransitAgency {
-        let name: String?
-        let phone: String?
-        let url: String?
-    }
-
-    struct TransitVehicle {
-        let icon: String?
-        let localIcon: String?
-        let name: String?
-        let type: String?
-    }
-
-}
+// }

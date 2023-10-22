@@ -23,9 +23,8 @@ import {
   AddPolylineOptions,
   AddPolylineResult,
   RemovePolylineOptions,
-  AddDirectionsOptions,
+  GetDirectionsOptions,
   // AddDirectionsResult,
-  RemoveDirectionsOptions,
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
   DidTapMapCallback,
@@ -107,11 +106,7 @@ export class CapacitorGoogleMapsWeb
     throw this.unimplemented("Not implemented on web.");
   }
 
-  async addDirections(_options: AddDirectionsOptions): Promise<void> {
-    throw this.unimplemented("Not implemented on web.");
-  }
-
-  async removeDirections(_options: RemoveDirectionsOptions): Promise<void> {
+  async getDirections(_options: GetDirectionsOptions): Promise<void> {
     throw this.unimplemented("Not implemented on web.");
   }
 

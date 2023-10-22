@@ -18,9 +18,9 @@ export { RemovePolygonOptions } from "./methods/RemovePolygon";
 export { AddPolylineOptions, AddPolylineResult } from "./methods/AddPolyline";
 export { RemovePolylineOptions } from "./methods/RemovePolyline";
 export {
-  AddDirectionsOptions,
-  AddDirectionsResult,
-} from "./methods/AddDirections";
+  GetDirectionsOptions,
+  GetDirectionsResult,
+} from "./methods/GetDirections";
 export { RemoveDirectionsOptions } from "./methods/RemoveDirections";
 
 // events
@@ -57,7 +57,6 @@ export { PolygonPreferences } from "./models/GoogleMap/Polygon/PolygonPreference
 export { Polyline } from "./models/GoogleMap/Polyline/Polyline";
 export { PolylinePreferences } from "./models/GoogleMap/Polyline/PolylinePreferences";
 export { Direction } from "./models/GoogleMap/Direction/Direction";
-export { DirectionPreferences } from "./models/GoogleMap/Direction/DirectionPreferences";
 export { DirectionResults } from "./models/GoogleMap/Direction/DirectionResults";
 export { BoundingRect } from "./models/BoundingRect";
 export { LatLng } from "./models/LatLng";

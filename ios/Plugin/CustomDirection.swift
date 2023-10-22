@@ -2,152 +2,255 @@ import Foundation
 import GoogleMaps
 import Capacitor
 
-class CustomDirection: CustomMapViewEvents {
+class CustomDirection: GoogleMapsDirections {
+    public typealias Response = GoogleMapsDirections.Response
+    public typealias Route = GoogleMapsDirections.Response.Route
+
     var id: String! = NSUUID().uuidString.lowercased()
-    var mapId: String! = ""
-    var origin: CLLocationCoordinate2D! = CLLocationCoordinate2D()
-    var destination: CLLocationCoordinate2D! = CLLocationCoordinate2D()
-    var waypoints: [String]! = [String]()
-    var travelMode: String! = "DRIVING"
-    
-    
-    public func updateFromJSObject(_ directionData: JSObject) {
-        // see src/interfaces/models/Directions for reference
-        let preferences = directionData["preferences"] as! JSObject
+    // var mapId: String! = ""
+    // var origin: GoogleMapsDirections.Place
+    // var destination: GoogleMapsDirections.Place
+    // var travelMode: GoogleMapsDirections.TravelMode = .driving
+    // var waypoints: [GoogleMapsDirections.Place] = []
 
-        if let preferences = preferences as? [String: [String: Double]], // Check if preferences is the expected dictionary structure
-            let originLatitude = preferences["origin"]?["latitude"],
-            let originLongitude = preferences["origin"]?["longitude"] {
-                self.origin = CLLocationCoordinate2D(
-                    latitude: originLatitude,
-                    longitude: originLongitude
-                )
+    // init(directionData: JSObject) {
+    //     self.mapId = directionData["mapId"] as? String
+    //     if let origin = directionData["origin"] as? JSObject {
+    //         self.origin = GoogleMapsDirections.Place(rawValue: origin["origin"] as? String ?? "") ?? .stringDescription(address: "")
+    //     } else {
+    //         self.origin = .stringDescription(address: "")
+    //     }
+
+    //     if let destination = directionData["destination"] as? JSObject {
+    //         self.destination = GoogleMapsDirections.Place(rawValue: destination["destination"] as? String ?? "") ?? .stringDescription(address: "")
+    //     } else {
+    //         self.destination = .stringDescription(address: "")
+    //     }
+
+    //     self.travelMode = GoogleMapsDirections.TravelMode(rawValue: directionData["travelMode"] as? String ?? "DRIVING") ?? .driving
+    //     self.waypoints = directionData["waypoints"] as? [GoogleMapsDirections.Place] ?? []
+    // }
+
+    // public func updateFromJSObject(_ directionData: JSObject) {
+    //     self.mapId = directionData["mapId"] as? String
+    //     if let origin = directionData["origin"] as? JSObject {
+    //         self.origin = GoogleMapsDirections.Place(rawValue: origin["origin"] as? String ?? "") ?? .stringDescription(address: "")
+    //     } else {
+    //         self.origin = .stringDescription(address: "")
+    //     }
+
+    //     if let destination = directionData["destination"] as? JSObject {
+    //         self.destination = GoogleMapsDirections.Place(rawValue: destination["destination"] as? String ?? "") ?? .stringDescription(address: "")
+    //     } else {
+    //         self.destination = .stringDescription(address: "")
+    //     }
+
+    //     self.travelMode = GoogleMapsDirections.TravelMode(rawValue: directionData["travelMode"] as? String ?? "DRIVING") ?? .driving
+    //     self.waypoints = directionData["waypoints"] as? [GoogleMapsDirections.Place] ?? []
+    // }
+    
+    public static func getResultForDirection(_ directionResults: Response) -> PluginCallResultData {
+        // var results: PluginCallResultData = [:]
+
+        // based on Response type, process the return data
+        var result: PluginCallResultData = [
+            "route": [
+                "summary": directionResults.routes[0].summary ?? "",
+                "waypointOrder": directionResults.routes[0].waypointOrder ,
+                "overviewPolylinePoints": directionResults.routes[0].overviewPolylinePoints ?? "",
+                "bounds": [
+                    "northeast": [
+                        "latitude": directionResults.routes[0].bounds?.northeast?.latitude ?? 0.0,
+                        "longitude": directionResults.routes[0].bounds?.northeast?.longitude ?? 0.0
+                    ],
+                    "southwest": [
+                        "latitude": directionResults.routes[0].bounds?.southwest?.latitude ?? 0.0,
+                        "longitude": directionResults.routes[0].bounds?.southwest?.longitude ?? 0.0
+                    ]
+                ],
+                "legs": []  // Initialize as an empty array
+            ]
+        ]
+
+        // Process legs within the route
+        var legs: [PluginCallResultData] = [] // Initialize as a regular array
+
+        for leg in directionResults.routes[0].legs {
+            var legData: JSObject = [
+                "startAddress": leg.startAddress ?? "",
+                "endAddress": leg.endAddress ?? "",
+                "steps": []  // Initialize as an empty array
+            ]
+
+            if let startLocation = leg.startLocation, let endLocation = leg.endLocation {
+                legData["startLocation"] = [
+                    "latitude": startLocation.latitude,
+                    "longitude": startLocation.longitude
+                ]
+                legData["endLocation"] = [
+                    "latitude": endLocation.latitude,
+                    "longitude": endLocation.longitude
+                ]
             }
-        if let preferences = preferences as? [String: [String: Double]], // Check if preferences is the expected dictionary structure
-        let destinationLatitude = preferences["destination"]?["latitude"],
-        let destinationLongitude = preferences["destination"]?["longitude"] {
-            self.destination = CLLocationCoordinate2D(
-                latitude: destinationLatitude,
-                longitude: destinationLongitude
-            )
-        }
-        if let preferences = preferences as? [String: [String: Double]], // Check if preferences is the expected dictionary structure
-        let waypointsLatitude = preferences["waypoints"]?["latitude"],
-        let waypointsLongitude = preferences["waypoints"]?["longitude"] {
-            self.waypoints = [String]()
-        }
-        if let preferences = preferences as? [String: [String: Double]], // Check if preferences is the expected dictionary structure
-        let travelMode = preferences["travelMode"] as? String {
-            self.travelMode = travelMode
-        }
-        if let preferences = preferences as? [String: [String: Double]], // Check if preferences is the expected dictionary structure
-        let mapId = directionData["mapId"] as? String {
-            self.mapId = mapId
-        }
 
-    }
-    
-    public static func getResultForDirection(_ directionResults: [DirectionResults], mapId: String) -> [PluginCallResultData] {
-        var results: [PluginCallResultData] = []
+            if let distance = leg.distance {
+                legData["distance"] = [
+                    "text": distance.text ?? "",
+                    "value": distance.value ?? 0.0
+                ]
+            }
 
-        for directionResult in directionResults {
-            for route in directionResult.routes {
-                // Process each route
-                var result: PluginCallResultData = [
-                    "route": [
-                        "summary": route.summary ?? "",
-                        "waypointOrder": route.waypointOrder ?? [],
-                        "overviewPolylinePoints": route.overviewPolylinePoints ?? "",
-                        "copyrights": route.copyrights ?? "",
-                        "warnings": route.warnings,
-                        "fare": route.fare ?? [:],  // You can adjust this as needed
-                        "legs": []  // Initialize as an empty array
+            if let duration = leg.duration {
+                legData["duration"] = [
+                    "text": duration.text ?? "",
+                    "value": duration.value ?? 0.0
+                ]
+            }
+
+            // Process steps within the leg
+            var steps: [PluginCallResultData] = [] // Initialize as a regular array
+            for step in leg.steps {
+                var stepData: JSObject = [
+                    "htmlInstructions": step.htmlInstructions ?? "",
+                    "distance": [
+                        "text": step.distance?.text ?? "",
+                        "value": step.distance?.value ?? 0.0
+                    ],
+                    "duration": [
+                        "text": step.duration?.text ?? "",
+                        "value": step.duration?.value ?? 0.0
                     ]
                 ]
 
-                // Process legs within the route
-                var legs: [PluginCallResultData] = [] // Initialize as a regular array
-                for leg in route.legs {
-                    var legData: PluginCallResultData = [
-                        "startAddress": leg.startAddress ?? "",
-                        "endAddress": leg.endAddress ?? "",
-                        "steps": []  // Initialize as an empty array
+                if let startLocation = step.startLocation, let endLocation = step.endLocation {
+                    stepData["startLocation"] = [
+                        "latitude": startLocation.latitude,
+                        "longitude": startLocation.longitude
                     ]
-
-                    if let startLocation = leg.startLocation, let endLocation = leg.endLocation {
-                        legData["startLocation"] = [
-                            "latitude": startLocation.latitude,
-                            "longitude": startLocation.longitude
-                        ]
-                        legData["endLocation"] = [
-                            "latitude": endLocation.latitude,
-                            "longitude": endLocation.longitude
-                        ]
-                    }
-
-                    if let distance = leg.distance {
-                        legData["distance"] = [
-                            "text": distance.text ?? "",
-                            "value": distance.value ?? 0.0
-                        ]
-                    }
-
-                    if let duration = leg.duration {
-                        legData["duration"] = [
-                            "text": duration.text ?? "",
-                            "value": duration.value ?? 0.0
-                        ]
-                    }
-
-                    // Process steps within the leg
-                    var steps: [PluginCallResultData] = [] // Initialize as a regular array
-                    for step in leg.steps {
-                        var stepData: PluginCallResultData = [
-                            "htmlInstructions": step.htmlInstructions ?? "",
-                            "distance": [
-                                "text": step.distance?.text ?? "",
-                                "value": step.distance?.value ?? 0.0
-                            ],
-                            "duration": [
-                                "text": step.duration?.text ?? "",
-                                "value": step.duration?.value ?? 0.0
-                            ]
-                        ]
-
-                        if let startLocation = step.startLocation, let endLocation = step.endLocation {
-                            stepData["startLocation"] = [
-                                "latitude": startLocation.latitude,
-                                "longitude": startLocation.longitude
-                            ]
-                            stepData["endLocation"] = [
-                                "latitude": endLocation.latitude,
-                                "longitude": endLocation.longitude
-                            ]
-                        }
-                        
-                        if let travelMode = step.travelMode {
-                            stepData["travelMode"] = travelMode.rawValue
-                        } else {
-                            stepData["travelMode"] = "" // Provide a default value if it's nil
-                        }
-
-                        stepData["polylinePoints"] = step.polylinePoints ?? ""
-                        stepData["maneuver"] = step.maneuver ?? ""
-                        stepData["transitDetails"] = step.transitDetails ?? [:] // You can adjust this as needed
-
-                        steps.append(stepData)
-                    }
-
-                    legData["steps"] = steps // Set the "steps" array
-                    legs.append(legData)
+                    stepData["endLocation"] = [
+                        "latitude": endLocation.latitude,
+                        "longitude": endLocation.longitude
+                    ]
+                }
+                
+                if let travelMode = step.travelMode {
+                    stepData["travelMode"] = travelMode.rawValue
+                } else {
+                    stepData["travelMode"] = "" // Provide a default value if it's nil
                 }
 
-                result["legs"] = legs // Set the "legs" array
-                results.append(result)
+                stepData["polylinePoints"] = step.polylinePoints ?? ""
+                stepData["maneuver"] = step.maneuver ?? ""
+                stepData["transitDetails"] = (step.transitDetails as? JSObject) ?? [:]
+
+                steps.append(stepData)
             }
+
+            legData["steps"] = steps // Set the "steps" array
+            legs.append(legData)
         }
 
-        return results
+        result["legs"] = legs // Set the "legs" array
+        // results.append(result)
+        
+        // for directionResult in directionResults {
+        //     for route in directionResult.routes {
+        //         // Process each route
+        //         var result: PluginCallResultData = [
+        //             "route": [
+        //                 "summary": route.summary ?? "",
+        //                 "waypointOrder": route.waypointOrder ?? [],
+        //                 "overviewPolylinePoints": route.overviewPolylinePoints ?? "",
+        //                 "copyrights": route.copyrights ?? "",
+        //                 "warnings": route.warnings,
+        //                 "fare": route.fare ?? [:],  // You can adjust this as needed
+        //                 "legs": []  // Initialize as an empty array
+        //             ]
+        //         ]
+
+        //         // Process legs within the route
+        //         var legs: [PluginCallResultData] = [] // Initialize as a regular array
+        //         for leg in route.legs {
+        //             var legData: PluginCallResultData = [
+        //                 "startAddress": leg.startAddress ?? "",
+        //                 "endAddress": leg.endAddress ?? "",
+        //                 "steps": []  // Initialize as an empty array
+        //             ]
+
+        //             if let startLocation = leg.startLocation, let endLocation = leg.endLocation {
+        //                 legData["startLocation"] = [
+        //                     "latitude": startLocation.latitude,
+        //                     "longitude": startLocation.longitude
+        //                 ]
+        //                 legData["endLocation"] = [
+        //                     "latitude": endLocation.latitude,
+        //                     "longitude": endLocation.longitude
+        //                 ]
+        //             }
+
+        //             if let distance = leg.distance {
+        //                 legData["distance"] = [
+        //                     "text": distance.text ?? "",
+        //                     "value": distance.value ?? 0.0
+        //                 ]
+        //             }
+
+        //             if let duration = leg.duration {
+        //                 legData["duration"] = [
+        //                     "text": duration.text ?? "",
+        //                     "value": duration.value ?? 0.0
+        //                 ]
+        //             }
+
+        //             // Process steps within the leg
+        //             var steps: [PluginCallResultData] = [] // Initialize as a regular array
+        //             for step in leg.steps {
+        //                 var stepData: PluginCallResultData = [
+        //                     "htmlInstructions": step.htmlInstructions ?? "",
+        //                     "distance": [
+        //                         "text": step.distance?.text ?? "",
+        //                         "value": step.distance?.value ?? 0.0
+        //                     ],
+        //                     "duration": [
+        //                         "text": step.duration?.text ?? "",
+        //                         "value": step.duration?.value ?? 0.0
+        //                     ]
+        //                 ]
+
+        //                 if let startLocation = step.startLocation, let endLocation = step.endLocation {
+        //                     stepData["startLocation"] = [
+        //                         "latitude": startLocation.latitude,
+        //                         "longitude": startLocation.longitude
+        //                     ]
+        //                     stepData["endLocation"] = [
+        //                         "latitude": endLocation.latitude,
+        //                         "longitude": endLocation.longitude
+        //                     ]
+        //                 }
+                        
+        //                 if let travelMode = step.travelMode {
+        //                     stepData["travelMode"] = travelMode.rawValue
+        //                 } else {
+        //                     stepData["travelMode"] = "" // Provide a default value if it's nil
+        //                 }
+
+        //                 stepData["polylinePoints"] = step.polylinePoints ?? ""
+        //                 stepData["maneuver"] = step.maneuver ?? ""
+        //                 stepData["transitDetails"] = step.transitDetails ?? [:] // You can adjust this as needed
+
+        //                 steps.append(stepData)
+        //             }
+
+        //             legData["steps"] = steps // Set the "steps" array
+        //             legs.append(legData)
+        //         }
+
+        //         result["legs"] = legs // Set the "legs" array
+        //         results.append(result)
+        //     }
+        // }
+
+        return result
     }
 
 

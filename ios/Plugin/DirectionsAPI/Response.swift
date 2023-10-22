@@ -21,7 +21,18 @@ import ObjectMapper
 
 // MARK: - Response
 public extension GoogleMapsDirections {
-    struct Response: Mappable {
+    // typealias LocationDegrees = Double
+    // struct LocationCoordinate2D {
+    //     var latitude: LocationDegrees
+    //     var longitude: LocationDegrees
+        
+    //     init(latitude: LocationDegrees, longitude: LocationDegrees) {
+    //         self.latitude = latitude
+    //         self.longitude = longitude
+    //     }
+    // }
+    
+    public struct Response: Mappable {
         public var status: StatusCode?
         public var errorMessage: String?
         
