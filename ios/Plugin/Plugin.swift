@@ -472,13 +472,13 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                 wayPoints: waypoints
             ) { (response, error) -> Void in
                 // Check Status Code and  if response is not nil
-                guard let response = response else {
-                    call.reject("Response is nil")
-                    return
-                }
                 guard response?.status == GoogleMapsDirections.StatusCode.ok else {
                     // Status Code is Not OK
                     print(response?.errorMessage ?? "")
+                    return
+                }
+                guard let response = response else {
+                    call.reject("Response is nil")
                     return
                 }
                 call.resolve(CustomDirection.getResultForDirection(response))
