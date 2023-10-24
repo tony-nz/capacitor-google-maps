@@ -393,7 +393,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
 
     @objc func addPolyline(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "");
-        print("Adding polyline")
 
         DispatchQueue.main.async {
             guard let customMapView = self.customWebView?.customMapViews[mapId] else {
@@ -403,8 +402,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
 
             if let path = call.getArray("path")?.capacitor.replacingNullValues() as? [JSObject?] {
                 let preferences = call.getObject("preferences", JSObject())
-
-                print("coordinates \(path)")
 
                 self.addPolyline([
                     "path": path,
@@ -452,19 +449,25 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
             let units = call.getObject("units") as? JSObject
 
             var waypoints: [GoogleMapsService.Place] = []
+
             if let waypointsArray = call.getArray("waypoints") {
                 for waypoint in waypointsArray {
-                    if let waypointData = waypoint as? GoogleMapsService.Place {
-                        waypoints.append(waypointData)
-                    } else {
-                        waypoints.append(.stringDescription(address: ""))
+                    if let waypointDict = waypoint as? [String: Any] {
+                        if let latitude = waypointDict["latitude"] as? Double, let longitude = waypointDict["longitude"] as? Double {
+                            // Create a coordinate-based Place
+                            let coordinate = GoogleMapsService.LocationCoordinate2D(latitude: latitude, longitude: longitude)
+                            let waypointData = GoogleMapsService.Place.coordinate(coordinate: coordinate)
+                            waypoints.append(waypointData)
+                        } else if let address = waypointDict["address"] as? String {
+                            // Create a Place with an address
+                            waypoints.append(.stringDescription(address: address))
+                        }
                     }
                 }
             }
 
-            // Google Maps Directions API
+            // Google Maps Directions
             GoogleMapsDirections.provide(apiKey: self.GOOGLE_MAPS_KEY)
-
             GoogleMapsDirections.direction(
                 fromOrigin: origin,
                 toDestination: destination,
@@ -482,7 +485,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                     return
                 }
                 call.resolve(CustomDirection.getResultForDirection(response))
-
             }
         }
     }
