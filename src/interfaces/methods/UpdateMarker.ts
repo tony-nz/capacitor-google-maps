@@ -13,6 +13,10 @@ export interface UpdateMarkerOptions {
    * @since 2.0.0
    */
   preferences?: MarkerPreferences;
+  /**
+   * added by tony-nz
+   */
+  markerId: string;
 }
 
 export interface UpdateMarkerResult {
