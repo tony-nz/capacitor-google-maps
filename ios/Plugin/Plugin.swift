@@ -354,6 +354,25 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         }
     }
     
+    @objc func updateMarker(_ call: CAPPluginCall) {
+        let mapId: String = call.getString("mapId", "")
+        let markerId: String = call.getString("markerId", "")
+
+        DispatchQueue.main.async {
+            guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+                call.reject("map not found")
+                return
+            }
+
+            let newMarkerData = call.getObject("newMarkerData", JSObject())
+
+            self.updateMarker(markerId: markerId, newMarkerData: newMarkerData, customMapView: customMapView) { marker in
+                call.resolve(CustomMarker.getResultForMarker(marker, mapId: mapId))
+            }
+        }
+    }
+
+
     @objc func addPolygon(_ call: CAPPluginCall) {
         let mapId: String = call.getString("mapId", "");
 
@@ -610,6 +629,37 @@ private extension CapacitorGoogleMaps {
             completion(marker)
         }
     }
+
+    func updateMarker(markerId: String, newMarkerData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSMarker>) {
+        DispatchQueue.main.async {
+            if let marker = self.customMarkers[markerId] as? CustomMarker {
+                // Update the marker with the new data
+                marker.updateFromJSObject(newMarkerData)
+
+                let preferences = newMarkerData["preferences"] as? JSObject ?? JSObject()
+
+                if let icon = preferences["icon"] as? JSObject {
+                    if let url = icon["url"] as? String {
+                        let size = icon["size"] as? JSObject ?? JSObject()
+                        let resizeWidth = size["width"] as? Int ?? 30
+                        let resizeHeight = size["height"] as? Int ?? 30
+                        DispatchQueue.global(qos: .background).async {
+                            self.imageCache.image(at: url, resizeWidth: resizeWidth, resizeHeight: resizeHeight) { image in
+                                DispatchQueue.main.async {
+                                    marker.icon = image
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // You can also update other properties of the marker here if needed
+
+                completion(marker)
+            }
+        }
+    }
+
     
     func addPolygon(_ polygonData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSPolygon>) {
         DispatchQueue.main.async {

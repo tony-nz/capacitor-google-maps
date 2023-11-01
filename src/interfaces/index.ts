@@ -13,6 +13,10 @@ export {
   AddMarkersResult,
 } from "./methods/AddMarkers";
 export { RemoveMarkerOptions } from "./methods/RemoveMarker";
+export {
+  UpdateMarkerOptions,
+  UpdateMarkerResult,
+} from "./methods/UpdateMarker";
 export { AddPolygonOptions, AddPolygonResult } from "./methods/AddPolygon";
 export { RemovePolygonOptions } from "./methods/RemovePolygon";
 export { AddPolylineOptions, AddPolylineResult } from "./methods/AddPolyline";

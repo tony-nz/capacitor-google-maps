@@ -55,7 +55,8 @@ public class GoogleMapsDirections: GoogleMapsService {
         var requestParameters: [String : Any] = baseRequestParameters + [
             "origin" : origin.toString(),
             "destination" : destination.toString(),
-            "mode" : travelMode.rawValue.lowercased()
+            "mode" : travelMode.rawValue.lowercased(),
+            "optimize": true
         ]
         
         if let wayPoints = wayPoints {

@@ -13,6 +13,7 @@ CAP_PLUGIN(CapacitorGoogleMaps, "CapacitorGoogleMaps",
            CAP_PLUGIN_METHOD(addMarker, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(addMarkers, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(removeMarker, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(updateMarker, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(addPolygon, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(removePolygon, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(addPolyline, CAPPluginReturnPromise);
