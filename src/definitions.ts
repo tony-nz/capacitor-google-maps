@@ -16,6 +16,7 @@ import {
   AddMarkersOptions,
   AddMarkersResult,
   RemoveMarkerOptions,
+  UpdateMarkerOptions,
   AddPolygonOptions,
   AddPolygonResult,
   RemovePolygonOptions,
@@ -77,6 +78,8 @@ export interface CapacitorGoogleMapsPlugin {
   addMarkers(options: AddMarkersOptions): Promise<AddMarkersResult>;
 
   removeMarker(options: RemoveMarkerOptions): Promise<void>;
+
+  updateMarker(options: UpdateMarkerOptions): Promise<UpdateMapResult>;
 
   addPolygon(options: AddPolygonOptions): Promise<AddPolygonResult>;
 
