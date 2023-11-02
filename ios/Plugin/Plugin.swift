@@ -363,10 +363,12 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                 call.reject("map not found")
                 return
             }
-
-            let newMarkerData = call.getObject("newMarkerData", JSObject())
-
-            self.updateMarker(markerId: markerId, newMarkerData: newMarkerData, customMapView: customMapView) { marker in
+            let position = call.getObject("position", JSObject())
+            let preferences = call.getObject("preferences", JSObject())
+            self.updateMarker(markerId: markerId, newMarkerData: [
+                "position": position,
+                "preferences": preferences
+            ], customMapView: customMapView) { marker in
                 call.resolve(CustomMarker.getResultForMarker(marker, mapId: mapId))
             }
         }
@@ -641,19 +643,18 @@ private extension CapacitorGoogleMaps {
                 if let icon = preferences["icon"] as? JSObject {
                     if let url = icon["url"] as? String {
                         let size = icon["size"] as? JSObject ?? JSObject()
-                        let resizeWidth = size["width"] as? Int ?? 30
-                        let resizeHeight = size["height"] as? Int ?? 30
+                        let resizeWidth = size["width"] as? Int ?? 130
+                        let resizeHeight = size["height"] as? Int ?? 130
                         DispatchQueue.global(qos: .background).async {
                             self.imageCache.image(at: url, resizeWidth: resizeWidth, resizeHeight: resizeHeight) { image in
                                 DispatchQueue.main.async {
+                                    print("updateMarker: \(image)")
                                     marker.icon = image
                                 }
                             }
                         }
                     }
                 }
-
-                // You can also update other properties of the marker here if needed
 
                 completion(marker)
             }
