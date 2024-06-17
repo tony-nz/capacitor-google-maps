@@ -43,7 +43,7 @@ import {
   DefaultEventOptions,
   DefaultEventWithPreventDefaultOptions,
 } from "./definitions";
-
+// @ts-ignore
 export class CapacitorGoogleMapsWeb
   extends WebPlugin
   implements CapacitorGoogleMapsPlugin
