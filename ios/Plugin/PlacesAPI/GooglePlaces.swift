@@ -1,18 +1,10 @@
-//
-//  GooglePlaces.swift
-//  GooglePlaces
-//
-//  Created by Honghao Zhang on 2016-02-12.
-//  Copyright © 2016 Honghao Zhang. All rights reserved.
-//
-
 import Foundation
 import Alamofire
 import ObjectMapper
 
 public class GooglePlaces: GoogleMapsService {
     
-    fileprivate static var pendingRequest: Alamofire.Request?
+    fileprivate static var pendingRequest: DataRequest?
     
     public static let placeAutocompleteURLString = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
     
@@ -59,26 +51,19 @@ public class GooglePlaces: GoogleMapsService {
             pendingRequest = nil
         }
         
-        let request = Alamofire.request(placeAutocompleteURLString, method: .get, parameters: requestParameters).responseJSON { response in
-            if response.result.error?._code == NSURLErrorCancelled {
-                // nothing to do, another active request is coming
-                return
+        let request = AF.request(placeAutocompleteURLString, parameters: requestParameters)
+        request.responseJSON { response in
+            if response.error?.isExplicitlyCancelledError == true {
+                return // Request was cancelled, so we exit early
             }
             
-            if response.result.isFailure {
+            if let error = response.error {
                 NSLog("Error: GET failed")
                 completion?(nil, NSError(domain: "GooglePlacesError", code: -1, userInfo: nil))
                 return
             }
             
-            // Nil
-            if let _ = response.result.value as? NSNull {
-                completion?(PlaceAutocompleteResponse(), nil)
-                return
-            }
-            
-            // JSON
-            guard let json = response.result.value as? [String : AnyObject] else {
+            guard let json = response.value as? [String : AnyObject] else {
                 NSLog("Error: Parsing json failed")
                 completion?(nil, NSError(domain: "GooglePlacesError", code: -2, userInfo: nil))
                 return
@@ -113,7 +98,6 @@ public class GooglePlaces: GoogleMapsService {
             }
             
             pendingRequest = nil
-            
             completion?(response, error)
         }
         
@@ -141,21 +125,14 @@ public extension GooglePlaces {
             requestParameters["language"] = language
         }
         
-        Alamofire.request(placeDetailsURLString, method: .get, parameters: requestParameters).responseJSON { response in
-            if response.result.isFailure {
+        AF.request(placeDetailsURLString, parameters: requestParameters).responseJSON { response in
+            if let error = response.error {
                 NSLog("Error: GET failed")
                 completion?(nil, NSError(domain: "GooglePlacesError", code: -1, userInfo: nil))
                 return
             }
             
-            // Nil
-            if let _ = response.result.value as? NSNull {
-                completion?(PlaceDetailsResponse(), nil)
-                return
-            }
-            
-            // JSON
-            guard let json = response.result.value as? [String : Any] else {
+            guard let json = response.value as? [String : Any] else {
                 NSLog("Error: Parsing json failed")
                 completion?(nil, NSError(domain: "GooglePlacesError", code: -2, userInfo: nil))
                 return
