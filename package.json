@@ -31,7 +31,7 @@
     "dist/",
     "ios/",
     "android/",
-    "TonyNzCapacitorCommunityGoogleMaps.podspec"
+    "TonyNzCapacitorGoogleMaps.podspec"
   ],
   "keywords": [
     "capacitor",
