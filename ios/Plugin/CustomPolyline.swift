@@ -44,11 +44,11 @@ class CustomPolyline : GMSPolyline {
                 "path": CustomPolyline.jsonFromPath(polyline.path),
                 "preferences": [
                     "title": polyline.title ?? "",
-                    "width": polyline.strokeWidth,
+                    "width": polyline.strokeWidth ?? 10.0,
                     "color": polyline.strokeColor ?? "",
-                    "zIndex": polyline.zIndex,
-                    "isGeodesic": polyline.geodesic,
-                    "isClickable": polyline.isTappable,
+                    "zIndex": polyline.zIndex ?? 1,
+                    "isGeodesic": polyline.geodesic ?? false,
+                    "isClickable": polyline.isTappable ?? false,
                     "metadata": tag["metadata"] ?? JSObject()
                 ]
             ]
