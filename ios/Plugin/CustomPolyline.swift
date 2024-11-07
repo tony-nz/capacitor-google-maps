@@ -45,7 +45,7 @@ class CustomPolyline : GMSPolyline {
                 "preferences": [
                     "title": polyline.title ?? "",
                     "width": polyline.strokeWidth ?? 10.0,
-                    "color": polyline.strokeColor ?? "",
+                    "color": hexStringFromColor(polyline.strokeColor) ?? "", // Convert UIColor to hex
                     "zIndex": polyline.zIndex ?? 1,
                     "isGeodesic": polyline.geodesic ?? false,
                     "isClickable": polyline.isTappable ?? false,
@@ -55,6 +55,13 @@ class CustomPolyline : GMSPolyline {
         ];
     }
     
+    private static func hexStringFromColor(_ color: UIColor) -> String {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        color.getRed(&red, green: &green, blue: &blue, alpha: nil)
+        return String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
+    }
 
     private static func jsonFromPath(_ path: GMSPath?) -> [JSObject] {
         guard let path = path else {

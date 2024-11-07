@@ -428,11 +428,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
                     "path": path,
                     "preferences": preferences
                 ], customMapView: customMapView) { polyline in
-                    // call.resolve(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
-                    let result = CustomPolyline.getResultForPolyline(polyline, mapId: mapId)
-                    CAPLog.print("POLYLINE \(result)")
-
-                    return result;
+                    call.resolve(CustomPolyline.getResultForPolyline(polyline, mapId: mapId))
                 }
             }
         }
