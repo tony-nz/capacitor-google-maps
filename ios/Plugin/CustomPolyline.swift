@@ -35,24 +35,29 @@ class CustomPolyline : GMSPolyline {
     }
     
     public static func getResultForPolyline(_ polyline: GMSPolyline, mapId: String) -> PluginCallResultData {
-        let tag: JSObject = polyline.userData as! JSObject
-
+        // Get userData and ensure it's JSON-serializable
+        let tag = polyline.userData as? JSObject ?? JSObject()
+        
+        // Convert strokeColor to hex string
+        let colorHex = hexStringFromColor(polyline.strokeColor) // Convert UIColor to hex
+        
+        // Prepare the JSON-serializable result
         return [
             "polyline": [
                 "mapId": mapId,
-                "polylineId": tag["polylineId"] ?? "",
-                "path": CustomPolyline.jsonFromPath(polyline.path),
+                "polylineId": tag["polylineId"] as? String ?? "",
+                "path": CustomPolyline.jsonFromPath(polyline.path),  // Convert GMSPath to JSON array
                 "preferences": [
                     "title": polyline.title ?? "",
-                    "width": polyline.strokeWidth ?? 10.0,
-                    "color": hexStringFromColor(polyline.strokeColor) ?? "", // Convert UIColor to hex
-                    "zIndex": polyline.zIndex ?? 1,
-                    "isGeodesic": polyline.geodesic ?? false,
-                    "isClickable": polyline.isTappable ?? false,
+                    "width": polyline.strokeWidth,
+                    "color": colorHex,
+                    "zIndex": polyline.zIndex,
+                    "isGeodesic": polyline.geodesic,
+                    "isClickable": polyline.isTappable,
                     "metadata": tag["metadata"] ?? JSObject()
                 ]
             ]
-        ];
+        ]
     }
     
     private static func hexStringFromColor(_ color: UIColor) -> String {
