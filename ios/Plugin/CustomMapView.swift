@@ -325,4 +325,20 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
         ]
     }
 
+    @objc func triggerInfoWindowClick(_ call: CAPPluginCall) {
+        guard let mapId = call.getString("mapId"), 
+              let markerId = call.getString("markerId") else {
+            call.reject("Missing mapId or markerId")
+            return
+        }
+
+        if let customMap = self.mapViewInstances[mapId], 
+          let marker = customMap.getMarker(by: markerId) {
+            customMap.triggerInfoWindowClick(for: marker)
+            call.resolve()
+        } else {
+            call.reject("Map or marker not found")
+        }
+    }
+
 }
