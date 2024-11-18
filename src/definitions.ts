@@ -3,6 +3,7 @@ import { PluginListenerHandle } from "@capacitor/core";
 import {
   // methods
   InitializeOptions,
+  CreateMapOptions,
   GetLocationResult,
   CreateMapResult,
   UpdateMapOptions,
