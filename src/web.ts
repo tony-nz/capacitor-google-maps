@@ -111,6 +111,10 @@ export class CapacitorGoogleMapsWeb
     throw this.unimplemented("Not implemented on web.");
   }
 
+  async TriggerInfoWindow(_options: TriggerInfoWindowOptions): Promise<void> {
+    throw this.unimplemented("Not implemented on web.");
+  }
+
   async getDirections(_options: GetDirectionsOptions): Promise<void> {
     throw this.unimplemented("Not implemented on web.");
   }

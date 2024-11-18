@@ -21,6 +21,7 @@ export { AddPolygonOptions, AddPolygonResult } from "./methods/AddPolygon";
 export { RemovePolygonOptions } from "./methods/RemovePolygon";
 export { AddPolylineOptions, AddPolylineResult } from "./methods/AddPolyline";
 export { RemovePolylineOptions } from "./methods/RemovePolyline";
+export { TriggerInfoWindowOptions } from "./methods/TriggerInfoWindow";
 export {
   GetDirectionsOptions,
   GetDirectionsResult,
