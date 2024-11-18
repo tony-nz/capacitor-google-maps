@@ -707,6 +707,19 @@ private extension CapacitorGoogleMaps {
         }
     }
 
+    func triggerInfoWindowClick(for markerId: String, customMapView: CustomMapView, completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.async {
+            // Find the marker by markerId
+            if let marker = self.customMarkers[markerId] {
+                // Trigger info window click for the marker
+                customMapView.triggerInfoWindowClick(for: marker)
+                completion(true)
+            } else {
+                completion(false)
+            }
+        }
+    }
+    
     func setupWebView() {
         DispatchQueue.main.async {
             self.customWebView?.isOpaque = false
