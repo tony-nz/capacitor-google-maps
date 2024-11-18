@@ -57,8 +57,10 @@ func decodePolyline(_ polylinePoints: String) -> [CLLocationCoordinate2D] {
 }
 
 @objc(CapacitorGoogleMaps)
-public class CapacitorGoogleMaps: CustomMapViewEvents {
+public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate {
 
+    var locationManager: CLLocationManager?
+    
     var GOOGLE_MAPS_KEY: String = "";
 
     var customMarkers = [String : CustomMarker]();
@@ -103,6 +105,43 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         ])
     }
 
+    @objc func getLocation(_ call: CAPPluginCall) {
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager = CLLocationManager() // Proper initialization
+            locationManager?.delegate = self
+            locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager?.requestWhenInUseAuthorization()
+            locationManager?.startUpdatingLocation()
+
+            // Save the plugin call to resolve later
+            self.bridge?.saveCall(call)
+        } else {
+            call.reject("Location services are not enabled")
+        }
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.first {
+            let result: [String: Double] = [
+                "latitude": location.coordinate.latitude,
+                "longitude": location.coordinate.longitude
+            ]
+
+            // Resolve the saved call using the new method
+            if let savedCall = self.bridge?.savedCall(withID: "getLocation") {
+                savedCall.resolve(result)
+            }
+            manager.stopUpdatingLocation()
+        }
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        // Reject the saved call using the new method
+        if let savedCall = self.bridge?.savedCall(withID: "getLocation") {
+            savedCall.reject("Failed to get location: \(error.localizedDescription)")
+        }
+    }
+    
     @objc func createMap(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             let customMapView : CustomMapView = CustomMapView(customMapViewEvents: self)
@@ -510,6 +549,8 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         }
     }
 
+<<<<<<< HEAD
+=======
     @objc func triggerInfoWindowClick(_ call: CAPPluginCall) {
         // guard let mapId = call.getString("mapId"),
         //     let markerId = call.getString("markerId") else {
@@ -532,6 +573,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
         // }
     }
 
+>>>>>>> f649f5e8f21d5106c15737eced5ef0b613758eb5
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
         setCallbackIdForEvent(call: call, eventName: CustomMapView.EVENT_DID_TAP_INFO_WINDOW);
     }
