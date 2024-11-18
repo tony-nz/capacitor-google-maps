@@ -106,17 +106,19 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
     }
 
     @objc func getLocation(_ call: CAPPluginCall) {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager = CLLocationManager() // Proper initialization
-            locationManager?.delegate = self
-            locationManager?.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager?.requestWhenInUseAuthorization()
-            locationManager?.startUpdatingLocation()
+        DispatchQueue.main.async {
+            if CLLocationManager.locationServicesEnabled() {
+                locationManager = CLLocationManager() // Proper initialization
+                locationManager?.delegate = self
+                locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+                locationManager?.requestWhenInUseAuthorization()
+                locationManager?.startUpdatingLocation()
 
-            // Save the plugin call to resolve later
-            self.bridge?.saveCall(call)
-        } else {
-            call.reject("Location services are not enabled")
+                // Save the plugin call to resolve later
+                self.bridge?.saveCall(call)
+            } else {
+                call.reject("Location services are not enabled")
+            }
         }
     }
     
