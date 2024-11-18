@@ -239,7 +239,7 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
                 return
             }
             
-            let result = customMapView.clearMap()
+            let result: () = customMapView.clearMap()
             
             call.resolve()
         }
@@ -496,19 +496,19 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
             let origin = GoogleMapsService.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: call.getObject("origin")?["latitude"] as? Double ?? 0.0, longitude: call.getObject("origin")?["longitude"] as? Double ?? 0.0))
             let destination = GoogleMapsService.Place.coordinate(coordinate: GoogleMapsService.LocationCoordinate2D(latitude: call.getObject("destination")?["latitude"] as? Double ?? 0.0, longitude: call.getObject("destination")?["longitude"] as? Double ?? 0.0))
             
-            let travelMode: GoogleMapsDirections.TravelMode = (call.getObject("travelMode") as? String)
+            let travelMode: GoogleMapsDirections.TravelMode = (call.getObject("travelMode")?["travelMode"] as? String)
                 .flatMap { GoogleMapsDirections.TravelMode(rawValue: $0) } ?? .driving
 
-            let alternatives = call.getObject("alternatives") as? JSObject
-            let arrivalTime = call.getObject("arrivalTime") as? JSObject
-            let avoid = call.getObject("avoid") as? JSObject
-            let departureTime = call.getObject("departureTime") as? JSObject
-            let language = call.getObject("language") as? JSObject
-            let region = call.getObject("region") as? JSObject
-            let transitMode = call.getObject("transitMode") as? JSObject
-            let trafficModel = call.getObject("trafficModel") as? JSObject
-            let transitRoutingPreference = call.getObject("transitRoutingPreference") as? JSObject
-            let units = call.getObject("units") as? JSObject
+            let alternatives = call.getObject("alternatives")?["alternatives"] as? Bool ?? false
+            let arrivalTime = call.getObject("arrivalTime")?["arrivalTime"] as? String
+            let avoid = call.getObject("avoid")?["avoid"] as? [String]
+            let departureTime = call.getObject("departureTime")?["departureTime"] as? String
+            let language = call.getObject("language")?["language"] as? String
+            let region = call.getObject("region")?["region"] as? String
+            let transitMode = call.getObject("transitMode")?["transitMode"] as? String
+            let trafficModel = call.getObject("trafficModel")?["trafficModel"] as? String
+            let transitRoutingPreference = call.getObject("transitRoutingPreference")?["transitRoutingPreference"] as? String
+            let units = call.getObject("units")?["units"] as? String
 
             var waypoints: [GoogleMapsService.Place] = []
 
@@ -697,7 +697,7 @@ private extension CapacitorGoogleMaps {
 
     func updateMarker(markerId: String, newMarkerData: JSObject, customMapView: CustomMapView, completion: @escaping VoidReturnClosure<GMSMarker>) {
         DispatchQueue.main.async {
-            if let marker = self.customMarkers[markerId] as? CustomMarker {
+            if let marker = self.customMarkers[markerId] {
                 // Update the marker with the new data
                 marker.updateFromJSObject(newMarkerData)
 
@@ -711,7 +711,6 @@ private extension CapacitorGoogleMaps {
                         DispatchQueue.global(qos: .background).async {
                             self.imageCache.image(at: url, resizeWidth: resizeWidth, resizeHeight: resizeHeight) { image in
                                 DispatchQueue.main.async {
-                                    print("updateMarker: \(image)")
                                     marker.icon = image
                                 }
                             }
