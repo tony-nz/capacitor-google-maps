@@ -25,6 +25,7 @@ import {
   AddPolylineResult,
   RemovePolylineOptions,
   GetDirectionsOptions,
+  TriggerInfoWindowOptions,
   // AddDirectionsResult,
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
