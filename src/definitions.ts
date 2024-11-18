@@ -3,7 +3,7 @@ import { PluginListenerHandle } from "@capacitor/core";
 import {
   // methods
   InitializeOptions,
-  CreateMapOptions,
+  GetLocationResult,
   CreateMapResult,
   UpdateMapOptions,
   UpdateMapResult,
@@ -63,6 +63,8 @@ export interface DidRequestElementFromPointResult {
 
 export interface CapacitorGoogleMapsPlugin {
   initialize(options: InitializeOptions): Promise<void>;
+
+  getLocation(): Promise<GetLocationResult>;
 
   createMap(options: CreateMapOptions): Promise<CreateMapResult>;
 

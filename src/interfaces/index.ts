@@ -1,5 +1,6 @@
 // methods
 export { InitializeOptions } from "./methods/Initialize";
+export { GetLocationResult } from "./methods/GetLocation";
 export { CreateMapOptions, CreateMapResult } from "./methods/CreateMap";
 export { UpdateMapOptions, UpdateMapResult } from "./methods/UpdateMap";
 export { RemoveMapOptions } from "./methods/RemoveMap";

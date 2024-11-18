@@ -4,6 +4,7 @@ import {
   CapacitorGoogleMapsPlugin,
   CallbackID,
   InitializeOptions,
+  GetLocationResult,
   CreateMapOptions,
   CreateMapResult,
   UpdateMapOptions,
@@ -60,6 +61,10 @@ export class CapacitorGoogleMapsWeb
     throw this.unimplemented("Not implemented on web.");
   }
 
+  async getLocation(): Promise<GetLocationResult> {
+    throw this.unimplemented("Not implemented on web.");
+  }
+
   async createMap(_options: CreateMapOptions): Promise<CreateMapResult> {
     throw this.unimplemented("Not implemented on web.");
   }
@@ -112,7 +117,7 @@ export class CapacitorGoogleMapsWeb
     throw this.unimplemented("Not implemented on web.");
   }
 
-  async TriggerInfoWindow(_options: TriggerInfoWindowOptions): Promise<void> {
+  async triggerInfoWindow(_options: TriggerInfoWindowOptions): Promise<void> {
     throw this.unimplemented("Not implemented on web.");
   }
 
