@@ -511,19 +511,25 @@ public class CapacitorGoogleMaps: CustomMapViewEvents {
     }
 
     @objc func triggerInfoWindowClick(_ call: CAPPluginCall) {
-        guard let mapId = call.getString("mapId"), 
-              let markerId = call.getString("markerId") else {
-            call.reject("Missing mapId or markerId")
-            return
-        }
-
-        if let customMap = self.mapViewInstances[mapId], 
-          let marker = customMap.getMarker(by: markerId) {
-            customMap.triggerInfoWindowClick(for: marker)
-            call.resolve()
-        } else {
-            call.reject("Map or marker not found")
-        }
+        // guard let mapId = call.getString("mapId"),
+        //     let markerId = call.getString("markerId") else {
+        //     call.reject("Missing mapId or markerId")
+        //     return
+        // }
+        
+        // // Access the customMapView from customWebView
+        // guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+        //     call.reject("Map not found")
+        //     return
+        // }
+        
+        // // Now access the marker and trigger the info window click
+        // if let marker = self.customMarkers[markerId] { // Assuming you have a dictionary for customMarkers
+        //     customMapView.triggerInfoWindowClick(for: marker)
+        //     call.resolve()
+        // } else {
+        //     call.reject("Marker not found")
+        // }
     }
 
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
@@ -708,18 +714,18 @@ private extension CapacitorGoogleMaps {
     }
 
     func triggerInfoWindowClick(for markerId: String, customMapView: CustomMapView, completion: @escaping (Bool) -> Void) {
-        DispatchQueue.main.async {
-            // Find the marker by markerId
-            if let marker = self.customMarkers[markerId] {
-                // Trigger info window click for the marker
-                customMapView.triggerInfoWindowClick(for: marker)
-                completion(true)
-            } else {
-                completion(false)
-            }
-        }
+        // DispatchQueue.main.async {
+        //     // Find the marker by markerId
+        //     if let marker = self.customMarkers[markerId] {
+        //         // Trigger info window click for the marker
+        //         customMapView.triggerInfoWindowClick(for: marker)
+        //         completion(true)
+        //     } else {
+        //         completion(false)
+        //     }
+        // }
     }
-    
+
     func setupWebView() {
         DispatchQueue.main.async {
             self.customWebView?.isOpaque = false
