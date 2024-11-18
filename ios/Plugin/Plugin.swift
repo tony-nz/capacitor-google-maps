@@ -549,8 +549,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
         }
     }
 
-<<<<<<< HEAD
-=======
     @objc func triggerInfoWindowClick(_ call: CAPPluginCall) {
         // guard let mapId = call.getString("mapId"),
         //     let markerId = call.getString("markerId") else {
@@ -573,7 +571,6 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
         // }
     }
 
->>>>>>> f649f5e8f21d5106c15737eced5ef0b613758eb5
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {
         setCallbackIdForEvent(call: call, eventName: CustomMapView.EVENT_DID_TAP_INFO_WINDOW);
     }
