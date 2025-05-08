@@ -551,26 +551,28 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
         }
     }
 
-    @objc func triggerInfoWindowClick(_ call: CAPPluginCall) {
-        // guard let mapId = call.getString("mapId"),
-        //     let markerId = call.getString("markerId") else {
-        //     call.reject("Missing mapId or markerId")
-        //     return
-        // }
-        
-        // // Access the customMapView from customWebView
-        // guard let customMapView = self.customWebView?.customMapViews[mapId] else {
-        //     call.reject("Map not found")
-        //     return
-        // }
-        
-        // // Now access the marker and trigger the info window click
-        // if let marker = self.customMarkers[markerId] { // Assuming you have a dictionary for customMarkers
-        //     customMapView.triggerInfoWindowClick(for: marker)
-        //     call.resolve()
-        // } else {
-        //     call.reject("Marker not found")
-        // }
+    @objc func triggerInfoWindow(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            guard let mapId = call.getString("mapId"),
+                let markerId = call.getString("markerId") else {
+                call.reject("Missing mapId or markerId")
+                return
+            }
+            
+            // Access the customMapView from customWebView
+            guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+                call.reject("Map not found")
+                return
+            }
+            
+            // Now access the marker and trigger the info window click
+            if let marker = self.customMarkers[markerId] {
+                customMapView.triggerInfoWindowClick(for: marker)
+                call.resolve()
+            } else {
+                call.reject("Marker not found")
+            }
+        }
     }
 
     @objc func didTapInfoWindow(_ call: CAPPluginCall) {

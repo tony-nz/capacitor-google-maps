@@ -325,4 +325,11 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
         ]
     }
 
+    func triggerInfoWindowClick(for marker: GMSMarker) {
+      // Run UI updates on the main thread
+      DispatchQueue.main.async {
+        self.GMapView.selectedMarker = marker
+      }
+    }
+
 }
