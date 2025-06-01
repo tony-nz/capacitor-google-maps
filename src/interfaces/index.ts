@@ -28,10 +28,15 @@ export {
   GetDirectionsResult,
 } from "./methods/GetDirections";
 export { RemoveDirectionsOptions } from "./methods/RemoveDirections";
+export {
+  EnableCustomInfoWindowsOptions,
+  EnableCustomInfoWindowsResult,
+} from "./methods/EnableCustomInfoWindows";
 
 // events
 export * from "./events/DidTapInfoWindow";
 export * from "./events/DidCloseInfoWindow";
+export * from "./events/DidTapCustomInfoWindowAction";
 export * from "./events/DidTapMap";
 export * from "./events/DidLongPressMap";
 export * from "./events/DidTapMarker";

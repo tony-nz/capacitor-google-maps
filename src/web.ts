@@ -27,9 +27,12 @@ import {
   RemovePolylineOptions,
   GetDirectionsOptions,
   TriggerInfoWindowOptions,
+  EnableCustomInfoWindowsOptions,
+  EnableCustomInfoWindowsResult,
   // AddDirectionsResult,
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
+  DidTapCustomInfoWindowActionCallback,
   DidTapMapCallback,
   DidLongPressMapCallback,
   DidTapMarkerCallback,
@@ -122,6 +125,12 @@ export class CapacitorGoogleMapsWeb
   }
 
   async getDirections(_options: GetDirectionsOptions): Promise<void> {
+    throw this.unimplemented("Not implemented on web.");
+  }
+
+  async enableCustomInfoWindows(
+    _options: EnableCustomInfoWindowsOptions
+  ): Promise<EnableCustomInfoWindowsResult> {
     throw this.unimplemented("Not implemented on web.");
   }
 
@@ -219,6 +228,13 @@ export class CapacitorGoogleMapsWeb
   async didEndMovingCamera(
     _options: DefaultEventOptions,
     _callback: DidEndMovingCameraCallback
+  ): Promise<CallbackID> {
+    throw this.unimplemented("Not implemented on web.");
+  }
+
+  async didTapCustomInfoWindowAction(
+    _options: DefaultEventOptions,
+    _callback: DidTapCustomInfoWindowActionCallback
   ): Promise<CallbackID> {
     throw this.unimplemented("Not implemented on web.");
   }

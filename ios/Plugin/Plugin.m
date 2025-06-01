@@ -21,8 +21,10 @@ CAP_PLUGIN(CapacitorGoogleMaps, "CapacitorGoogleMaps",
            CAP_PLUGIN_METHOD(removePolyline, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(triggerInfoWindow, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getDirections, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(enableCustomInfoWindows, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(didTapInfoWindow, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(didCloseInfoWindow, CAPPluginReturnCallback);
+           CAP_PLUGIN_METHOD(didTapCustomInfoWindowAction, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(didTapMap, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(didLongPressMap, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(didTapMarker, CAPPluginReturnCallback);

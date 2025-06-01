@@ -26,6 +26,8 @@ import {
   RemovePolylineOptions,
   TriggerInfoWindowOptions,
   GetDirectionsOptions,
+  EnableCustomInfoWindowsOptions,
+  EnableCustomInfoWindowsResult,
   // events
   DidTapInfoWindowCallback,
   DidCloseInfoWindowCallback,
@@ -41,6 +43,7 @@ import {
   DidBeginMovingCameraCallback,
   DidMoveCameraCallback,
   DidEndMovingCameraCallback,
+  DidTapCustomInfoWindowActionCallback,
 } from "./interfaces";
 
 export type CallbackID = string;
@@ -92,10 +95,14 @@ export interface CapacitorGoogleMapsPlugin {
   addPolyline(options: AddPolylineOptions): Promise<AddPolylineResult>;
 
   removePolyline(options: RemovePolylineOptions): Promise<void>;
-  
+
   triggerInfoWindow(options: TriggerInfoWindowOptions): Promise<void>;
 
   getDirections(options: GetDirectionsOptions): Promise<void>;
+
+  enableCustomInfoWindows(
+    options: EnableCustomInfoWindowsOptions
+  ): Promise<EnableCustomInfoWindowsResult>;
 
   didTapInfoWindow(
     options: DefaultEventOptions,
@@ -181,6 +188,11 @@ export interface CapacitorGoogleMapsPlugin {
     eventName: "didRequestElementFromPoint",
     listenerFunc: (result: DidRequestElementFromPointResult) => void
   ): PluginListenerHandle;
+
+  didTapCustomInfoWindowAction(
+    options: DefaultEventOptions,
+    callback: DidTapCustomInfoWindowActionCallback
+  ): Promise<CallbackID>;
 }
 
 export * from "./interfaces";

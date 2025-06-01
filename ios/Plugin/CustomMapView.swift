@@ -39,6 +39,12 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     var savedCallbackIdForDidMoveCamera: String!;
     var savedCallbackIdForDidEndMovingCamera: String!;
 
+    // Custom info window properties
+    var customInfoWindow: CustomInfoWindow?
+    var currentSelectedMarker: GMSMarker?
+    var isCustomInfoWindowEnabled: Bool = true
+    var savedCallbackIdForDidTapCustomInfoWindowAction: String!
+
     static var EVENT_DID_TAP_INFO_WINDOW: String = "didTapInfoWindow";
     static var EVENT_DID_CLOSE_INFO_WINDOW: String = "didCloseInfoWindow";
     static var EVENT_DID_TAP_MAP: String = "didTapMap";
@@ -53,6 +59,7 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     static var EVENT_DID_BEGIN_MOVING_CAMERA: String = "didBeginMovingCamera";
     static var EVENT_DID_MOVE_CAMERA: String = "didMoveCamera";
     static var EVENT_DID_END_MOVING_CAMERA: String = "didEndMovingCamera";
+    static var EVENT_DID_TAP_CUSTOM_INFO_WINDOW_ACTION: String = "didTapCustomInfoWindowAction";
 
     var boundingRect = BoundingRect();
     var mapCameraPosition = MapCameraPosition();
@@ -121,6 +128,7 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     func clearMap() {
         if (self.GMapView != nil) {
             self.GMapView.clear();
+            hideCustomInfoWindow()
         }
     }
     
@@ -181,8 +189,76 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
                 savedCallbackIdForDidMoveCamera = callbackId
             } else if (eventName == CustomMapView.EVENT_DID_END_MOVING_CAMERA) {
                 savedCallbackIdForDidEndMovingCamera = callbackId
+            } else if (eventName == CustomMapView.EVENT_DID_TAP_CUSTOM_INFO_WINDOW_ACTION) {
+                savedCallbackIdForDidTapCustomInfoWindowAction = callbackId
             }
         }
+    }
+
+    // MARK: - Custom Info Window Methods
+    
+    private func showCustomInfoWindow(for marker: GMSMarker) {
+        hideCustomInfoWindow()
+        
+        customInfoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        customInfoWindow?.configure(with: marker, mapId: self.id, customMapViewEvents: customMapViewEvents, customMapView: self)
+        
+        if let infoWindow = customInfoWindow {
+            self.view.addSubview(infoWindow)
+            updateCustomInfoWindowPosition(for: marker)
+            currentSelectedMarker = marker
+        }
+    }
+    
+    public func hideCustomInfoWindow() {
+        customInfoWindow?.removeFromSuperview()
+        customInfoWindow = nil
+        currentSelectedMarker = nil
+    }
+    
+    private func updateCustomInfoWindowPosition(for marker: GMSMarker) {
+        guard let infoWindow = customInfoWindow else { return }
+        
+        let markerPosition = GMapView.projection.point(for: marker.position)
+        
+        // Position the info window above the marker
+        let infoWindowX = markerPosition.x - (infoWindow.frame.width / 2)
+        let infoWindowY = markerPosition.y - infoWindow.frame.height - 10 // 10 points above marker
+        
+        infoWindow.center = CGPoint(x: markerPosition.x, y: infoWindowY + (infoWindow.frame.height / 2))
+        
+        // Ensure the info window stays within the map bounds
+        let mapBounds = self.view.bounds
+        if infoWindow.frame.minX < mapBounds.minX {
+            infoWindow.frame.origin.x = mapBounds.minX + 10
+        } else if infoWindow.frame.maxX > mapBounds.maxX {
+            infoWindow.frame.origin.x = mapBounds.maxX - infoWindow.frame.width - 10
+        }
+        
+        if infoWindow.frame.minY < mapBounds.minY {
+            // If info window would go above the map, show it below the marker instead
+            infoWindow.center = CGPoint(x: markerPosition.x, y: markerPosition.y + infoWindow.frame.height / 2 + 10)
+        }
+    }
+    
+    // Check if marker has custom info window data
+    private func hasCustomInfoWindow(marker: GMSMarker) -> Bool {
+        guard let userData = marker.userData as? JSObject,
+              let metadata = userData["metadata"] as? JSObject,
+              let _ = metadata["infoWindow"] as? JSObject else {
+            return false
+        }
+        return true
+    }
+
+    // MARK: - GMSMapViewDelegate Methods
+
+    // Override the default info window to return empty view for custom info windows
+    internal func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+        if isCustomInfoWindowEnabled && hasCustomInfoWindow(marker: marker) {
+            return UIView() // Return empty view to disable default info window
+        }
+        return nil // Use default info window
     }
 
     internal func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
@@ -200,6 +276,9 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     }
     
     internal func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
+        // Hide custom info window when tapping on the map
+        hideCustomInfoWindow()
+        
         if (customMapViewEvents != nil && savedCallbackIdForDidTapMap != nil) {
             let result: PluginCallResultData = self.getResultForPosition(coordinate: coordinate);
             customMapViewEvents.resultForCallbackId(callbackId: savedCallbackIdForDidTapMap, result: result);
@@ -214,6 +293,13 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     }
 
     internal func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        // Handle custom info window display
+        if isCustomInfoWindowEnabled && hasCustomInfoWindow(marker: marker) {
+            showCustomInfoWindow(for: marker)
+        } else {
+            hideCustomInfoWindow()
+        }
+        
         if (customMapViewEvents != nil && savedCallbackIdForDidTapMarker != nil) {
             let result: PluginCallResultData = CustomMarker.getResultForMarker(marker, mapId: self.id);
             customMapViewEvents.resultForCallbackId(callbackId: savedCallbackIdForDidTapMarker, result: result);
@@ -288,6 +374,11 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     }
     
     internal func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+        // Update custom info window position when camera moves
+        if let marker = currentSelectedMarker {
+            updateCustomInfoWindowPosition(for: marker)
+        }
+        
         if (customMapViewEvents != nil && savedCallbackIdForDidMoveCamera != nil) {
             customMapViewEvents.resultForCallbackId(callbackId: savedCallbackIdForDidMoveCamera, result: nil);
         }
@@ -328,7 +419,11 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     func triggerInfoWindowClick(for marker: GMSMarker) {
       // Run UI updates on the main thread
       DispatchQueue.main.async {
-        self.GMapView.selectedMarker = marker
+        if self.isCustomInfoWindowEnabled && self.hasCustomInfoWindow(marker: marker) {
+            self.showCustomInfoWindow(for: marker)
+        } else {
+            self.GMapView.selectedMarker = marker
+        }
       }
     }
 

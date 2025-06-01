@@ -631,6 +631,33 @@ public class CapacitorGoogleMaps: CustomMapViewEvents, CLLocationManagerDelegate
         setCallbackIdForEvent(call: call, eventName: CustomMapView.EVENT_DID_END_MOVING_CAMERA);
     }
 
+    @objc func enableCustomInfoWindows(_ call: CAPPluginCall) {
+        let mapId: String = call.getString("mapId", "")
+        let enabled: Bool = call.getBool("enabled", true)
+
+        DispatchQueue.main.async {
+            guard let customMapView = self.customWebView?.customMapViews[mapId] else {
+                call.reject("map not found")
+                return
+            }
+            
+            customMapView.isCustomInfoWindowEnabled = enabled
+            
+            // If disabling custom info windows, hide any currently shown custom info window
+            if !enabled {
+                customMapView.hideCustomInfoWindow()
+            }
+            
+            call.resolve([
+                "enabled": enabled
+            ])
+        }
+    }
+
+    @objc func didTapCustomInfoWindowAction(_ call: CAPPluginCall) {
+        setCallbackIdForEvent(call: call, eventName: "didTapCustomInfoWindowAction");
+    }
+
     func setCallbackIdForEvent(call: CAPPluginCall, eventName: String) {
         let mapId: String = call.getString("mapId", "")
 
