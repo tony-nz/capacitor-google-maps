@@ -32,6 +32,7 @@ await CapacitorGoogleMaps.enableCustomInfoWindows({
 When adding markers, include custom info window data in the metadata:
 
 ```typescript
+// Basic example with plain text
 await CapacitorGoogleMaps.addMarker({
   mapId: "your-map-id",
   position: {
@@ -50,6 +51,30 @@ await CapacitorGoogleMaps.addMarker({
         snippetColor: "#666666",
         buttonColor: "#007AFF",
         backgroundColor: "#FFFFFF",
+      },
+    },
+  },
+});
+
+// Example with HTML snippet
+await CapacitorGoogleMaps.addMarker({
+  mapId: "your-map-id",
+  position: {
+    latitude: 37.7849,
+    longitude: -122.4094,
+  },
+  preferences: {
+    title: "Fisherman's Wharf",
+    snippet: "Famous waterfront area",
+    metadata: {
+      infoWindow: {
+        title: "Fisherman's Wharf",
+        snippet:
+          "<b>Famous waterfront area</b><br/>Visit <i>Pier 39</i> and see the sea lions!",
+        isSnippetHTML: true,
+        buttonText: "Get Directions",
+        titleColor: "#2C3E50",
+        buttonColor: "#28A745",
       },
     },
   },
@@ -81,15 +106,100 @@ await CapacitorGoogleMaps.didTapCustomInfoWindowAction(
 
 The `infoWindow` object in the marker metadata supports the following properties:
 
-| Property          | Type   | Description                          | Default         |
-| ----------------- | ------ | ------------------------------------ | --------------- |
-| `title`           | string | The title text                       | Marker title    |
-| `snippet`         | string | The description text                 | Marker snippet  |
-| `buttonText`      | string | Text for the action button           | No button shown |
-| `titleColor`      | string | Hex color for title text             | `#000000`       |
-| `snippetColor`    | string | Hex color for snippet text           | `#666666`       |
-| `buttonColor`     | string | Hex color for button background      | `#007AFF`       |
-| `backgroundColor` | string | Hex color for info window background | `#FFFFFF`       |
+| Property          | Type    | Description                               | Default         |
+| ----------------- | ------- | ----------------------------------------- | --------------- |
+| `title`           | string  | The title text                            | Marker title    |
+| `snippet`         | string  | The description text (plain text or HTML) | Marker snippet  |
+| `isSnippetHTML`   | boolean | Whether the snippet contains HTML         | `false`         |
+| `buttonText`      | string  | Text for the action button                | No button shown |
+| `titleColor`      | string  | Hex color for title text                  | `#000000`       |
+| `snippetColor`    | string  | Hex color for snippet text                | `#666666`       |
+| `buttonColor`     | string  | Hex color for button background           | `#007AFF`       |
+| `backgroundColor` | string  | Hex color for info window background      | `#FFFFFF`       |
+
+## HTML Snippet Support
+
+Custom info windows support HTML content in the snippet field. This allows you to create rich, formatted text with:
+
+- **Bold** and _italic_ text
+- Links
+- Lists
+- Line breaks
+- Custom styling
+
+### Basic HTML Example
+
+```typescript
+await CapacitorGoogleMaps.addMarker({
+  mapId: "your-map-id",
+  position: {
+    latitude: 37.7749,
+    longitude: -122.4194,
+  },
+  preferences: {
+    metadata: {
+      infoWindow: {
+        title: "San Francisco",
+        snippet:
+          "<b>The Golden Gate City</b><br/>Population: <i>874,961</i><br/><br/>Famous for its <b>Golden Gate Bridge</b> and historic cable cars.",
+        isSnippetHTML: true,
+        buttonText: "Learn More",
+        titleColor: "#2C3E50",
+        buttonColor: "#3498DB",
+      },
+    },
+  },
+});
+```
+
+### Advanced HTML Example
+
+```typescript
+await CapacitorGoogleMaps.addMarker({
+  mapId: "your-map-id",
+  position: {
+    latitude: 37.7849,
+    longitude: -122.4094,
+  },
+  preferences: {
+    metadata: {
+      infoWindow: {
+        title: "Fisherman's Wharf",
+        snippet: `
+          <div>
+            <p><b>Popular Attractions:</b></p>
+            <ul>
+              <li>Pier 39</li>
+              <li>Sea Lions</li>
+              <li>Aquarium of the Bay</li>
+            </ul>
+            <p><i>Open daily from 10 AM - 6 PM</i></p>
+          </div>
+        `,
+        isSnippetHTML: true,
+        buttonText: "Get Directions",
+        backgroundColor: "#F8F9FA",
+        titleColor: "#495057",
+        buttonColor: "#28A745",
+      },
+    },
+  },
+});
+```
+
+### Supported HTML Tags
+
+The following HTML tags are supported in snippet content:
+
+- `<b>`, `<strong>` - Bold text
+- `<i>`, `<em>` - Italic text
+- `<br/>` - Line breaks
+- `<p>` - Paragraphs
+- `<ul>`, `<ol>`, `<li>` - Lists
+- `<div>` - Containers
+- `<span>` - Inline containers
+
+**Note:** Complex CSS styling and JavaScript are not supported. Keep HTML simple and semantic.
 
 ## Example: Complete Implementation
 
