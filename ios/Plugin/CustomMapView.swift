@@ -200,7 +200,7 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     private func showCustomInfoWindow(for marker: GMSMarker) {
         hideCustomInfoWindow()
         
-        customInfoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        customInfoWindow = CustomInfoWindow()
         customInfoWindow?.configure(with: marker, mapId: self.id, customMapViewEvents: customMapViewEvents, callbackId: savedCallbackIdForDidTapCustomInfoWindowAction)
         
         if let infoWindow = customInfoWindow {
@@ -218,6 +218,10 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
     
     private func updateCustomInfoWindowPosition(for marker: GMSMarker) {
         guard let infoWindow = customInfoWindow else { return }
+        
+        // Force layout to get the actual size
+        infoWindow.setNeedsLayout()
+        infoWindow.layoutIfNeeded()
         
         let markerPosition = GMapView.projection.point(for: marker.position)
         

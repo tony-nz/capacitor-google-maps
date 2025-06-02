@@ -6,7 +6,6 @@
       
       var titleLabel: UILabel!
       var snippetTextView: UITextView!
-      var actionButton: UIButton!
       
       var markerId: String?
       var mapId: String?
@@ -15,6 +14,7 @@
       
       // Configuration flags
       private var isSnippetHTML: Bool = false
+      private var snippetHeightConstraint: NSLayoutConstraint?
       
       override init(frame: CGRect) {
           super.init(frame: frame)
@@ -35,6 +35,9 @@
           self.layer.shadowOpacity = 0.3
           self.layer.shadowRadius = 4
           
+          // CRITICAL: Disable autoresizing mask constraints for the main view
+          self.translatesAutoresizingMaskIntoConstraints = false
+          
           // Create title label
           titleLabel = UILabel()
           titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
@@ -52,23 +55,22 @@
           snippetTextView.backgroundColor = UIColor.clear
           snippetTextView.textContainer.lineFragmentPadding = 0
           snippetTextView.textContainerInset = UIEdgeInsets.zero
+          snippetTextView.textContainer.maximumNumberOfLines = 0
+          snippetTextView.textContainer.lineBreakMode = .byWordWrapping
           snippetTextView.translatesAutoresizingMaskIntoConstraints = false
           addSubview(snippetTextView)
-          
-          // Create action button
-          actionButton = UIButton(type: .system)
-          actionButton.setTitle("Action", for: .normal)
-          actionButton.backgroundColor = UIColor.systemBlue
-          actionButton.setTitleColor(UIColor.white, for: .normal)
-          actionButton.layer.cornerRadius = 4
-          actionButton.translatesAutoresizingMaskIntoConstraints = false
-          actionButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
-          addSubview(actionButton)
           
           setupConstraints()
       }
       
       private func setupConstraints() {
+          // Create height constraint for snippet text view
+          snippetHeightConstraint = snippetTextView.heightAnchor.constraint(greaterThanOrEqualToConstant: 20)
+          
+          // Create width constraint with lower priority
+          let widthConstraint = widthAnchor.constraint(equalToConstant: 250)
+          widthConstraint.priority = UILayoutPriority(999) // High but not required
+          
           NSLayoutConstraint.activate([
               // Title label constraints
               titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
@@ -79,17 +81,14 @@
               snippetTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
               snippetTextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
               snippetTextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+              snippetTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
+              snippetHeightConstraint!,
               
-              // Action button constraints
-              actionButton.topAnchor.constraint(equalTo: snippetTextView.bottomAnchor, constant: 8),
-              actionButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-              actionButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-              actionButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
-              actionButton.heightAnchor.constraint(equalToConstant: 32),
-              
-              // Overall width constraint
-              widthAnchor.constraint(equalToConstant: 250)
+              // Width constraint with lower priority
+              widthConstraint
           ])
+          
+          // Let the content determine the size - no fixed frame
       }
       
       func configure(with marker: GMSMarker, mapId: String, customMapViewEvents: CustomMapViewEvents?, callbackId: String?) {
@@ -121,14 +120,13 @@
                       snippetTextView.text = snippetContent
                   }
                   
-                  if let buttonText = infoWindow["buttonText"] as? String {
-                      actionButton.setTitle(buttonText, for: .normal)
-                      actionButton.isHidden = false
-                  } else {
-                      actionButton.isHidden = true
-                  }
+                  // Remove debug background
+                  snippetTextView.backgroundColor = UIColor.clear
                   
-                  // Customize colors if provided
+                  // Update layout after setting content
+                  updateLayoutForContent()
+                  
+                  // Customize colors and sizes if provided
                   if let titleColor = infoWindow["titleColor"] as? String {
                       titleLabel.textColor = self.safeColorFromHex(titleColor) ?? UIColor.black
                   }
@@ -137,20 +135,46 @@
                       snippetTextView.textColor = self.safeColorFromHex(snippetColor) ?? UIColor.gray
                   }
                   
-                  if let buttonColor = infoWindow["buttonColor"] as? String {
-                      actionButton.backgroundColor = self.safeColorFromHex(buttonColor) ?? UIColor.systemBlue
-                  }
-                  
                   if let backgroundColor = infoWindow["backgroundColor"] as? String {
                       self.backgroundColor = self.safeColorFromHex(backgroundColor) ?? UIColor.white
+                  }
+                  
+                  // Set text sizes if provided
+                  if let titleSize = infoWindow["titleSize"] as? CGFloat {
+                      titleLabel.font = UIFont.boldSystemFont(ofSize: titleSize)
+                  }
+                  
+                  if let snippetSize = infoWindow["snippetSize"] as? CGFloat {
+                      if isSnippetHTML {
+                          // For HTML content, we'll update the font in the attributed string
+                          updateHTMLFontSize(snippetSize)
+                      } else {
+                          snippetTextView.font = UIFont.systemFont(ofSize: snippetSize)
+                      }
                   }
               } else {
                   // Fallback to default marker title/snippet
                   titleLabel.text = marker.title ?? "No Title"
                   snippetTextView.text = marker.snippet ?? "No Description"
-                  actionButton.isHidden = true
               }
           }
+      }
+      
+      private func updateLayoutForContent() {
+          // Force the text view to calculate its content size with flexible width
+          let maxSize = CGSize(width: 226, height: CGFloat.greatestFiniteMagnitude) // 250 - 24 (padding)
+          let textSize = snippetTextView.sizeThatFits(maxSize)
+          
+          // Update the height constraint
+          let newHeight = max(textSize.height, 20)
+          snippetHeightConstraint?.constant = newHeight
+          
+          // Update the text view height constraint if needed
+          snippetTextView.invalidateIntrinsicContentSize()
+          
+          // Force layout update
+          setNeedsLayout()
+          layoutIfNeeded()
       }
       
       // HTML parsing method
@@ -179,9 +203,37 @@
               mutableAttributedString.addAttribute(.foregroundColor, value: snippetTextView.textColor ?? UIColor.gray, range: range)
               
               snippetTextView.attributedText = mutableAttributedString
+              
+              // Force layout update to ensure proper sizing
+              snippetTextView.sizeToFit()
+              snippetTextView.layoutIfNeeded()
+              
           } catch {
               // Fallback to plain text if HTML parsing fails
               snippetTextView.text = htmlString
+          }
+          
+          // Ensure layout is updated after setting HTML content
+          DispatchQueue.main.async {
+              self.updateLayoutForContent()
+          }
+      }
+      
+      // Update font size for HTML content
+      private func updateHTMLFontSize(_ fontSize: CGFloat) {
+          guard let attributedText = snippetTextView.attributedText else { return }
+          
+          let mutableAttributedString = NSMutableAttributedString(attributedString: attributedText)
+          let range = NSRange(location: 0, length: mutableAttributedString.length)
+          
+          // Update font size while preserving other attributes
+          mutableAttributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: fontSize), range: range)
+          
+          snippetTextView.attributedText = mutableAttributedString
+          
+          // Update layout after font change
+          DispatchQueue.main.async {
+              self.updateLayoutForContent()
           }
       }
       
@@ -211,24 +263,5 @@
           let blue = CGFloat(rgbValue & 0x0000FF) / 255.0
           
           return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
-      }
-      
-      @objc private func actionButtonTapped() {
-          guard let markerId = markerId,
-                let mapId = mapId,
-                let customMapViewEvents = customMapViewEvents,
-                let callbackId = callbackId else { return }
-          
-          // Trigger custom info window button tap event
-          let result: PluginCallResultData = [
-              "marker": [
-                  "mapId": mapId,
-                  "markerId": markerId
-              ],
-              "action": "buttonTap"
-          ]
-          
-          // Use the proper callback system
-          customMapViewEvents.resultForCallbackId(callbackId: callbackId, result: result)
       }
   } 

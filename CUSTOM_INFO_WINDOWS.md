@@ -6,10 +6,10 @@ This guide explains how to use the custom info windows feature in the Capacitor 
 
 Custom info windows allow you to create interactive, styled info windows that appear when users tap on markers. Unlike the default Google Maps info windows, these custom info windows support:
 
-- Interactive buttons
-- Custom styling (colors, fonts, etc.)
+- Custom styling (colors, fonts, text sizes, etc.)
+- HTML content with rich formatting
 - Custom content layout
-- Button click events
+- Automatic sizing based on content
 
 ## Setup
 
@@ -46,11 +46,11 @@ await CapacitorGoogleMaps.addMarker({
       infoWindow: {
         title: "Custom Title",
         snippet: "Custom description text",
-        buttonText: "Learn More",
         titleColor: "#333333",
         snippetColor: "#666666",
-        buttonColor: "#007AFF",
         backgroundColor: "#FFFFFF",
+        titleSize: 18,
+        snippetSize: 14,
       },
     },
   },
@@ -72,50 +72,29 @@ await CapacitorGoogleMaps.addMarker({
         snippet:
           "<b>Famous waterfront area</b><br/>Visit <i>Pier 39</i> and see the sea lions!",
         isSnippetHTML: true,
-        buttonText: "Get Directions",
         titleColor: "#2C3E50",
-        buttonColor: "#28A745",
+        titleSize: 16,
+        snippetSize: 13,
       },
     },
   },
 });
 ```
 
-### 3. Listen for Button Clicks
-
-Set up a listener for custom info window button clicks:
-
-```typescript
-await CapacitorGoogleMaps.didTapCustomInfoWindowAction(
-  {
-    mapId: "your-map-id",
-  },
-  (result) => {
-    if (result) {
-      console.log("Button clicked for marker:", result.marker.markerId);
-      console.log("Action:", result.action);
-
-      // Handle the button click
-      // For example, navigate to a detail page or show more information
-    }
-  }
-);
-```
-
 ## Custom Info Window Properties
 
 The `infoWindow` object in the marker metadata supports the following properties:
 
-| Property          | Type    | Description                               | Default         |
-| ----------------- | ------- | ----------------------------------------- | --------------- |
-| `title`           | string  | The title text                            | Marker title    |
-| `snippet`         | string  | The description text (plain text or HTML) | Marker snippet  |
-| `isSnippetHTML`   | boolean | Whether the snippet contains HTML         | `false`         |
-| `buttonText`      | string  | Text for the action button                | No button shown |
-| `titleColor`      | string  | Hex color for title text                  | `#000000`       |
-| `snippetColor`    | string  | Hex color for snippet text                | `#666666`       |
-| `buttonColor`     | string  | Hex color for button background           | `#007AFF`       |
-| `backgroundColor` | string  | Hex color for info window background      | `#FFFFFF`       |
+| Property          | Type    | Description                               | Default        |
+| ----------------- | ------- | ----------------------------------------- | -------------- |
+| `title`           | string  | The title text                            | Marker title   |
+| `snippet`         | string  | The description text (plain text or HTML) | Marker snippet |
+| `isSnippetHTML`   | boolean | Whether the snippet contains HTML         | `false`        |
+| `titleColor`      | string  | Hex color for title text                  | `#000000`      |
+| `snippetColor`    | string  | Hex color for snippet text                | `#666666`      |
+| `backgroundColor` | string  | Hex color for info window background      | `#FFFFFF`      |
+| `titleSize`       | number  | Font size for title text (in points)      | `16`           |
+| `snippetSize`     | number  | Font size for snippet text (in points)    | `14`           |
 
 ## HTML Snippet Support
 
@@ -143,9 +122,9 @@ await CapacitorGoogleMaps.addMarker({
         snippet:
           "<b>The Golden Gate City</b><br/>Population: <i>874,961</i><br/><br/>Famous for its <b>Golden Gate Bridge</b> and historic cable cars.",
         isSnippetHTML: true,
-        buttonText: "Learn More",
         titleColor: "#2C3E50",
-        buttonColor: "#3498DB",
+        titleSize: 18,
+        snippetSize: 14,
       },
     },
   },
@@ -177,10 +156,10 @@ await CapacitorGoogleMaps.addMarker({
           </div>
         `,
         isSnippetHTML: true,
-        buttonText: "Get Directions",
         backgroundColor: "#F8F9FA",
         titleColor: "#495057",
-        buttonColor: "#28A745",
+        titleSize: 16,
+        snippetSize: 13,
       },
     },
   },
@@ -193,13 +172,20 @@ The following HTML tags are supported in snippet content:
 
 - `<b>`, `<strong>` - Bold text
 - `<i>`, `<em>` - Italic text
-- `<br/>` - Line breaks
+- `<br/>`, `<br>` - Line breaks (properly rendered)
 - `<p>` - Paragraphs
 - `<ul>`, `<ol>`, `<li>` - Lists
 - `<div>` - Containers
 - `<span>` - Inline containers
 
 **Note:** Complex CSS styling and JavaScript are not supported. Keep HTML simple and semantic.
+
+### HTML Rendering Notes
+
+- Line breaks (`<br/>` or `<br>`) are properly rendered and will create new lines
+- The info window automatically adjusts its height to accommodate multi-line content
+- HTML content is parsed using iOS's built-in HTML rendering capabilities
+- If HTML parsing fails, the content will fallback to plain text display
 
 ## Example: Complete Implementation
 
@@ -234,14 +220,6 @@ class MapService {
       enabled: true,
     });
 
-    // Set up button click listener
-    await CapacitorGoogleMaps.didTapCustomInfoWindowAction(
-      {
-        mapId: this.mapId,
-      },
-      this.handleInfoWindowAction.bind(this)
-    );
-
     // Add markers with custom info windows
     await this.addCustomMarkers();
   }
@@ -274,33 +252,16 @@ class MapService {
             infoWindow: {
               title: location.title,
               snippet: location.description,
-              buttonText: "View Details",
               titleColor: "#2C3E50",
               snippetColor: "#7F8C8D",
-              buttonColor: "#3498DB",
               backgroundColor: "#FFFFFF",
+              titleSize: 16,
+              snippetSize: 14,
             },
           },
         },
       });
     }
-  }
-
-  private handleInfoWindowAction(result: any) {
-    if (result && result.marker) {
-      const markerId = result.marker.markerId;
-      const locationId = result.marker.metadata?.locationId;
-
-      console.log(`Info window button clicked for marker: ${markerId}`);
-
-      // Handle the action - for example, navigate to a detail page
-      this.showLocationDetails(locationId);
-    }
-  }
-
-  private showLocationDetails(locationId: string) {
-    // Implement your detail view logic here
-    console.log(`Showing details for location: ${locationId}`);
   }
 
   async disableCustomInfoWindows() {
@@ -323,6 +284,7 @@ class MapService {
 ## Styling Tips
 
 - Use hex colors for consistent styling across devices
-- Keep button text short and descriptive
 - Consider the contrast between text and background colors
-- The info window has a fixed width of 200 points but height adjusts to content
+- The info window has a preferred width of 250 points but adjusts based on content
+- Text sizes are specified in points (typical range: 12-20 points)
+- HTML content supports basic formatting but keep it simple for best results
