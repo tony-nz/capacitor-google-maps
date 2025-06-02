@@ -79,7 +79,6 @@
               snippetTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
               snippetTextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
               snippetTextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-              snippetTextView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -8),
               
               // Action button constraints
               actionButton.topAnchor.constraint(equalTo: snippetTextView.bottomAnchor, constant: 8),
@@ -89,7 +88,7 @@
               actionButton.heightAnchor.constraint(equalToConstant: 32),
               
               // Overall width constraint
-              widthAnchor.constraint(equalToConstant: 200)
+              widthAnchor.constraint(equalToConstant: 250)
           ])
       }
       
