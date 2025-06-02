@@ -201,7 +201,7 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
         hideCustomInfoWindow()
         
         customInfoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
-        customInfoWindow?.configure(with: marker, mapId: self.id, customMapViewEvents: customMapViewEvents, customMapView: self)
+        customInfoWindow?.configure(with: marker, mapId: self.id, customMapViewEvents: customMapViewEvents, callbackId: savedCallbackIdForDidTapCustomInfoWindowAction)
         
         if let infoWindow = customInfoWindow {
             self.view.addSubview(infoWindow)

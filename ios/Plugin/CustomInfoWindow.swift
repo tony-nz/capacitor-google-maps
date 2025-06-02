@@ -4,14 +4,14 @@ import GoogleMaps
 
 class CustomInfoWindow: UIView {
     
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var snippetLabel: UILabel!
-    @IBOutlet weak var actionButton: UIButton!
+    var titleLabel: UILabel!
+    var snippetLabel: UILabel!
+    var actionButton: UIButton!
     
     var markerId: String?
     var mapId: String?
     var customMapViewEvents: CustomMapViewEvents?
-    var customMapView: CustomMapView?
+    var callbackId: String?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -85,10 +85,10 @@ class CustomInfoWindow: UIView {
         ])
     }
     
-    func configure(with marker: GMSMarker, mapId: String, customMapViewEvents: CustomMapViewEvents?, customMapView: CustomMapView?) {
+    func configure(with marker: GMSMarker, mapId: String, customMapViewEvents: CustomMapViewEvents?, callbackId: String?) {
         self.mapId = mapId
         self.customMapViewEvents = customMapViewEvents
-        self.customMapView = customMapView
+        self.callbackId = callbackId
         
         // Extract marker data
         if let userData = marker.userData as? JSObject {
@@ -110,19 +110,19 @@ class CustomInfoWindow: UIView {
                 
                 // Customize colors if provided
                 if let titleColor = infoWindow["titleColor"] as? String {
-                    titleLabel.textColor = UIColor(hexString: titleColor) ?? UIColor.black
+                    titleLabel.textColor = self.safeColorFromHex(titleColor) ?? UIColor.black
                 }
                 
                 if let snippetColor = infoWindow["snippetColor"] as? String {
-                    snippetLabel.textColor = UIColor(hexString: snippetColor) ?? UIColor.gray
+                    snippetLabel.textColor = self.safeColorFromHex(snippetColor) ?? UIColor.gray
                 }
                 
                 if let buttonColor = infoWindow["buttonColor"] as? String {
-                    actionButton.backgroundColor = UIColor(hexString: buttonColor) ?? UIColor.systemBlue
+                    actionButton.backgroundColor = self.safeColorFromHex(buttonColor) ?? UIColor.systemBlue
                 }
                 
                 if let backgroundColor = infoWindow["backgroundColor"] as? String {
-                    self.backgroundColor = UIColor(hexString: backgroundColor) ?? UIColor.white
+                    self.backgroundColor = self.safeColorFromHex(backgroundColor) ?? UIColor.white
                 }
             } else {
                 // Fallback to default marker title/snippet
@@ -133,12 +133,39 @@ class CustomInfoWindow: UIView {
         }
     }
     
+    // Safe color parsing method to avoid assertion failures
+    private func safeColorFromHex(_ hexString: String) -> UIColor? {
+        var hex = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Remove # prefix if present
+        if hex.hasPrefix("#") {
+            hex = String(hex.dropFirst())
+        }
+        
+        // Ensure we have exactly 6 characters
+        guard hex.count == 6 else {
+            return nil
+        }
+        
+        // Convert to UInt32
+        var rgbValue: UInt32 = 0
+        guard Scanner(string: hex).scanHexInt32(&rgbValue) else {
+            return nil
+        }
+        
+        // Extract RGB components
+        let red = CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0
+        let green = CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0
+        let blue = CGFloat(rgbValue & 0x0000FF) / 255.0
+        
+        return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+    }
+    
     @objc private func actionButtonTapped() {
         guard let markerId = markerId,
               let mapId = mapId,
               let customMapViewEvents = customMapViewEvents,
-              let customMapView = customMapView,
-              let callbackId = customMapView.savedCallbackIdForDidTapCustomInfoWindowAction else { return }
+              let callbackId = callbackId else { return }
         
         // Trigger custom info window button tap event
         let result: PluginCallResultData = [
@@ -151,26 +178,5 @@ class CustomInfoWindow: UIView {
         
         // Use the proper callback system
         customMapViewEvents.resultForCallbackId(callbackId: callbackId, result: result)
-    }
-}
-
-// Extension to create UIColor from hex string
-extension UIColor {
-    convenience init?(hexString: String) {
-        let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int = UInt64()
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            return nil
-        }
-        self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
     }
 } 
