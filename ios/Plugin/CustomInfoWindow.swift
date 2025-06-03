@@ -16,6 +16,10 @@
       private var isSnippetHTML: Bool = false
       private var snippetHeightConstraint: NSLayoutConstraint?
       
+      // Offset properties
+      var offsetX: CGFloat = 0
+      var offsetY: CGFloat = -10 // Default: 10 points above marker
+      
       override init(frame: CGRect) {
           super.init(frame: frame)
           setupView()
@@ -151,6 +155,15 @@
                       } else {
                           snippetTextView.font = UIFont.systemFont(ofSize: snippetSize)
                       }
+                  }
+                  
+                  // Set offset if provided
+                  if let offsetXValue = infoWindow["offsetX"] as? CGFloat {
+                      offsetX = offsetXValue
+                  }
+                  
+                  if let offsetYValue = infoWindow["offsetY"] as? CGFloat {
+                      offsetY = offsetYValue
                   }
               } else {
                   // Fallback to default marker title/snippet

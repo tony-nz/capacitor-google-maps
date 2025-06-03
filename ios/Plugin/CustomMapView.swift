@@ -225,11 +225,15 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
         
         let markerPosition = GMapView.projection.point(for: marker.position)
         
-        // Position the info window above the marker
-        let infoWindowX = markerPosition.x - (infoWindow.frame.width / 2)
-        let infoWindowY = markerPosition.y - infoWindow.frame.height - 10 // 10 points above marker
+        // Use custom offset values from the info window
+        let offsetX = infoWindow.offsetX
+        let offsetY = infoWindow.offsetY
         
-        infoWindow.center = CGPoint(x: markerPosition.x, y: infoWindowY + (infoWindow.frame.height / 2))
+        // Position the info window with custom offset
+        let infoWindowX = markerPosition.x - (infoWindow.frame.width / 2) + offsetX
+        let infoWindowY = markerPosition.y - infoWindow.frame.height + offsetY
+        
+        infoWindow.center = CGPoint(x: markerPosition.x + offsetX, y: infoWindowY + (infoWindow.frame.height / 2))
         
         // Ensure the info window stays within the map bounds
         let mapBounds = self.view.bounds
@@ -241,7 +245,7 @@ class CustomMapView: UIViewController, GMSMapViewDelegate {
         
         if infoWindow.frame.minY < mapBounds.minY {
             // If info window would go above the map, show it below the marker instead
-            infoWindow.center = CGPoint(x: markerPosition.x, y: markerPosition.y + infoWindow.frame.height / 2 + 10)
+            infoWindow.center = CGPoint(x: markerPosition.x + offsetX, y: markerPosition.y + infoWindow.frame.height / 2 + abs(offsetY) + 10)
         }
     }
     

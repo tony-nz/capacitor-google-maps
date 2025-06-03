@@ -51,6 +51,8 @@ await CapacitorGoogleMaps.addMarker({
         backgroundColor: "#FFFFFF",
         titleSize: 18,
         snippetSize: 14,
+        offsetX: 0,
+        offsetY: -20, // Position further above the marker
       },
     },
   },
@@ -95,6 +97,56 @@ The `infoWindow` object in the marker metadata supports the following properties
 | `backgroundColor` | string  | Hex color for info window background      | `#FFFFFF`      |
 | `titleSize`       | number  | Font size for title text (in points)      | `16`           |
 | `snippetSize`     | number  | Font size for snippet text (in points)    | `14`           |
+| `offsetX`         | number  | Horizontal offset from marker (in points) | `0`            |
+| `offsetY`         | number  | Vertical offset from marker (in points)   | `-10`          |
+
+## Positioning and Offset
+
+The info window position can be customized using offset values:
+
+- **`offsetX`**: Horizontal offset from the marker center
+  - Positive values move the info window to the right
+  - Negative values move the info window to the left
+- **`offsetY`**: Vertical offset from the marker position
+  - Positive values move the info window down (below the marker)
+  - Negative values move the info window up (above the marker)
+  - Default is `-10` to position the info window above the marker
+
+### Offset Examples
+
+```typescript
+// Position info window above and to the right of marker
+await CapacitorGoogleMaps.addMarker({
+  mapId: "your-map-id",
+  position: { latitude: 37.7749, longitude: -122.4194 },
+  preferences: {
+    metadata: {
+      infoWindow: {
+        title: "Above Right",
+        snippet: "Positioned above and to the right",
+        offsetX: 50, // 50 points to the right
+        offsetY: -30, // 30 points above
+      },
+    },
+  },
+});
+
+// Position info window below the marker
+await CapacitorGoogleMaps.addMarker({
+  mapId: "your-map-id",
+  position: { latitude: 37.7849, longitude: -122.4094 },
+  preferences: {
+    metadata: {
+      infoWindow: {
+        title: "Below Marker",
+        snippet: "Positioned below the marker",
+        offsetX: 0, // Centered horizontally
+        offsetY: 40, // 40 points below
+      },
+    },
+  },
+});
+```
 
 ## HTML Snippet Support
 
@@ -288,3 +340,6 @@ class MapService {
 - The info window has a preferred width of 250 points but adjusts based on content
 - Text sizes are specified in points (typical range: 12-20 points)
 - HTML content supports basic formatting but keep it simple for best results
+- Use negative `offsetY` values to position above markers (default: -10)
+- Use positive `offsetY` values to position below markers
+- Adjust `offsetX` to avoid overlapping with other UI elements
